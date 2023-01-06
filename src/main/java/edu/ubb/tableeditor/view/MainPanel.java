@@ -12,7 +12,7 @@ import edu.ubb.tableeditor.service.search.MatchCaseSearchStrategy;
 import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.search.SubStringSearchStrategy;
 import edu.ubb.tableeditor.service.search.WholeCellSearchStrategy;
-import edu.ubb.tableeditor.utils.Constants;
+import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.view.button.SearchRadioButton;
 import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
@@ -51,8 +51,14 @@ public final class MainPanel extends JFrame {
     @Flag
     private boolean initialized;
 
+    private final int windowHeight;
+    private final int windowWidth;
+
     private MainPanel(MainController mainController) {
         this.mainController = mainController;
+
+        windowWidth = PropertiesContext.getIntProperty("window.size.width");
+        windowHeight = PropertiesContext.getIntProperty("window.size.height");
     }
 
     public static synchronized MainPanel instance() {
@@ -112,7 +118,7 @@ public final class MainPanel extends JFrame {
     private void createTable() {
         this.table = new SimpleTable();
         final JScrollPane scrollPane = new JScrollPane(table.getComponent());
-        scrollPane.setPreferredSize(new Dimension(Constants.WIN_SIZE_WIDTH, Constants.WIN_SIZE_HEIGHT));
+        scrollPane.setPreferredSize(new Dimension(windowWidth, windowHeight));
         this.add(scrollPane);
     }
 
@@ -143,7 +149,7 @@ public final class MainPanel extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        this.setSize(Constants.WIN_SIZE_WIDTH, Constants.WIN_SIZE_HEIGHT);
+        this.setSize(windowWidth, windowHeight);
     }
 
     private void registerKeyShortcuts() {
@@ -256,7 +262,7 @@ public final class MainPanel extends JFrame {
         chartFrame.setContentPane(new ChartPanel(chart));
         chartFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         chartFrame.setLocationRelativeTo(null);
-        chartFrame.setSize(Constants.WIN_SIZE_WIDTH, Constants.WIN_SIZE_HEIGHT);
+        chartFrame.setSize(windowWidth, windowHeight);
         chartFrame.setVisible(true);
     }
 

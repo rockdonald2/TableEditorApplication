@@ -4,7 +4,6 @@ import edu.ubb.tableeditor.command.RemoveColumnCommand;
 import edu.ubb.tableeditor.command.RemoveRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
 import edu.ubb.tableeditor.model.Position;
-import edu.ubb.tableeditor.utils.Constants;
 import edu.ubb.tableeditor.view.MainPanel;
 import edu.ubb.tableeditor.view.diagrams.BarChartStrategy;
 import edu.ubb.tableeditor.view.diagrams.PieChartStrategy;
@@ -22,10 +21,7 @@ import java.util.EventObject;
 public class SimpleTable extends JTable implements Table {
 
     public SimpleTable() {
-        this.setSize(Constants.WIN_SIZE_WIDTH, Constants.WIN_SIZE_HEIGHT);
-        this.setRowHeight(24);
         this.setModel(this.constructModel(new String[][]{}, new String[]{"...", "..."}));
-        this.setPreferredSize(new Dimension(Constants.WIN_SIZE_WIDTH, Constants.WIN_SIZE_HEIGHT));
         this.getTableHeader().setReorderingAllowed(false);
 
         addPopup();

@@ -1,7 +1,10 @@
 package edu.ubb.tableeditor.utils;
 
+import edu.ubb.tableeditor.annotation.Singleton;
+
 import java.util.Optional;
 
+@Singleton
 public final class Util {
 
     private Util() {

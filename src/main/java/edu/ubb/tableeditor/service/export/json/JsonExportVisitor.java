@@ -2,6 +2,7 @@ package edu.ubb.tableeditor.service.export.json;
 
 import edu.ubb.tableeditor.model.DecimalField;
 import edu.ubb.tableeditor.model.IntegerField;
+import edu.ubb.tableeditor.model.PhoneNumberField;
 import edu.ubb.tableeditor.model.TextField;
 import edu.ubb.tableeditor.service.export.ExportVisitor;
 
@@ -29,6 +30,11 @@ public class JsonExportVisitor implements ExportVisitor {
     @Override
     public String visit(DecimalField decimal) {
         return String.format("\"%s\": %s", decimal.getKey(), BigDecimal.valueOf(decimal.getValue()).toPlainString());
+    }
+
+    @Override
+    public String visit(PhoneNumberField phoneNumber) {
+        return visit((TextField) phoneNumber);
     }
 
 }

@@ -2,9 +2,9 @@ package edu.ubb.tableeditor.service.export.json;
 
 import edu.ubb.tableeditor.model.Field;
 import edu.ubb.tableeditor.model.TextField;
+import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.export.ExportVisitor;
 import edu.ubb.tableeditor.service.export.Exporter;
-import edu.ubb.tableeditor.utils.Converters;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,21 +15,6 @@ public class JsonExporter extends Exporter {
     @Override
     public ExportVisitor exportVisitor() {
         return new JsonExportVisitor();
-    }
-
-    @Override
-    public Field parseField(String key, String value) {
-        Optional<Field> field = Converters.tryParseNumberField(key, value);
-
-        if (field.isEmpty()) {
-            field = Converters.tryParseDecimalField(key, value);
-        }
-
-        if (field.isEmpty()) {
-            field = Optional.of(new TextField(key, value));
-        }
-
-        return field.get();
     }
 
     @Override
@@ -44,7 +29,7 @@ public class JsonExporter extends Exporter {
 
             row.forEach(value -> {
                 String key = headers.get(fieldIdx.get());
-                Field field = parseField(key, value);
+                Field field = converter.convert(key, value).orElseThrow();
 
                 exportedData.append(field.accept(exporterVisitor));
 
