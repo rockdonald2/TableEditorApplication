@@ -1,6 +1,6 @@
 package edu.ubb.tableeditor.model;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CsvData implements Data {
@@ -9,8 +9,8 @@ public class CsvData implements Data {
     private List<List<String>> data;
 
     public CsvData() {
-        this.headers = Collections.emptyList();
-        this.data = Collections.emptyList();
+        this.headers = new ArrayList<>();
+        this.data = new ArrayList<>();
     }
 
     @Override

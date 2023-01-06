@@ -11,6 +11,11 @@ public class SimpleTableModel extends CustomTableModel {
     }
 
     @Override
+    public Object getValueAt(int row, int column) {
+        return MainController.instance().getValueAt(new Position(row, column));
+    }
+
+    @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         MainController.instance().executeCommand(new EditCommand(MainController.instance(), aValue.toString(), new Position(rowIndex, columnIndex)));
     }

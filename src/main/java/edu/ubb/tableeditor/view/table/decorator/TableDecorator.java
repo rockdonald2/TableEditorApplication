@@ -14,8 +14,13 @@ public abstract class TableDecorator implements Table {
     }
 
     @Override
-    public final JTable getComponent() {
-        return table.getComponent();
+    public JScrollPane getContainer() {
+        return table.getContainer();
+    }
+
+    @Override
+    public final JTable getTable() {
+        return table.getTable();
     }
 
     @Override
@@ -27,5 +32,7 @@ public abstract class TableDecorator implements Table {
     public CustomTableModel constructModel(String[][] data, String[] headers) {
         return table.constructModel(data, headers);
     }
+
+    public abstract void reset();
 
 }

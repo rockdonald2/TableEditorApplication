@@ -4,15 +4,15 @@ import edu.ubb.tableeditor.command.RemoveColumnCommand;
 import edu.ubb.tableeditor.command.RemoveRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
 import edu.ubb.tableeditor.model.Position;
-import edu.ubb.tableeditor.view.MainPanel;
+import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.view.diagrams.BarChartStrategy;
 import edu.ubb.tableeditor.view.diagrams.PieChartStrategy;
-import edu.ubb.tableeditor.view.table.decorator.ProtectedFieldTableDecorator;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 import edu.ubb.tableeditor.view.table.model.SimpleTableModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,9 +20,17 @@ import java.util.EventObject;
 
 public class SimpleTable extends JTable implements Table {
 
+    private final JScrollPane container;
+
     public SimpleTable() {
-        this.setModel(this.constructModel(new String[][]{}, new String[]{"...", "..."}));
+        int windowWidth = PropertiesContext.getIntProperty("window.size.width");
+        int windowHeight = PropertiesContext.getIntProperty("window.size.height");
+
+        this.setModel(this.constructModel(new String[][]{}, new String[]{" "}));
         this.getTableHeader().setReorderingAllowed(false);
+
+        this.container = new JScrollPane(getTable());
+        this.container.setPreferredSize(new Dimension(windowWidth, windowHeight));
 
         addPopup();
         addEditor();
@@ -40,9 +48,9 @@ public class SimpleTable extends JTable implements Table {
             }
 
             private boolean startWithKeyEvent(KeyEvent e) {
-                if ((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+                if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
                     return false;
-                } else return (e.getModifiersEx() & KeyEvent.ALT_DOWN_MASK) == 0;
+                } else return (e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0;
             }
         };
 
@@ -72,11 +80,6 @@ public class SimpleTable extends JTable implements Table {
                 int colAtPoint = getColumnAtPoint(popupMenu);
 
                 if (colAtPoint == -1) {
-                    return;
-                }
-
-                if (isProtectedColumn(colAtPoint)) {
-                    MainPanel.instance().showError("Cannot delete protected column");
                     return;
                 }
 
@@ -146,18 +149,13 @@ public class SimpleTable extends JTable implements Table {
         return SimpleTable.this.columnAtPoint(point);
     }
 
-    private boolean isProtectedColumn(int colIdx) {
-        if (!(MainPanel.instance().getTable() instanceof ProtectedFieldTableDecorator protectedFieldTableDecorator)) {
-            return false;
-        }
-
-        final Position position = protectedFieldTableDecorator.getProtectedPosition();
-
-        return position.getColumn() == colIdx;
+    @Override
+    public JScrollPane getContainer() {
+        return this.container;
     }
 
     @Override
-    public JTable getComponent() {
+    public JTable getTable() {
         return this;
     }
 

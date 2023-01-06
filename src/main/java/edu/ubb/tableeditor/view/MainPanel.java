@@ -18,7 +18,6 @@ import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
 import edu.ubb.tableeditor.view.table.SimpleTable;
 import edu.ubb.tableeditor.view.table.Table;
-import edu.ubb.tableeditor.view.table.decorator.ResettableTableDecorator;
 import edu.ubb.tableeditor.view.table.decorator.RowNumberTableDecorator;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -27,6 +26,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
@@ -40,19 +40,16 @@ public final class MainPanel extends JFrame {
     private static MainPanel instance;
 
     private final MainController mainController;
-
+    private final int windowHeight;
+    private final int windowWidth;
     private Table table;
     private JMenuItem addRowBtn;
     private JMenuItem addColumnBtn;
     private JMenuItem exportItem;
     private JCheckBoxMenuItem rowDecoratorBtn;
     private JMenuItem findBtn;
-
     @Flag
     private boolean initialized;
-
-    private final int windowHeight;
-    private final int windowWidth;
 
     private MainPanel(MainController mainController) {
         this.mainController = mainController;
@@ -82,10 +79,6 @@ public final class MainPanel extends JFrame {
         initialized = true;
     }
 
-    public Table getTable() {
-        return table;
-    }
-
     private void addNewRow(ActionEvent e) {
         mainController.executeCommand(new AddRowCommand(mainController, new Position(mainController.getRows(), 0)));
     }
@@ -106,31 +99,30 @@ public final class MainPanel extends JFrame {
             MainPanel.this.table = new RowNumberTableDecorator(MainPanel.this.table);
             MainPanel.this.mainController.doDisplayData();
         } else {
-            if (MainPanel.this.table instanceof ResettableTableDecorator resettableTableDecorator) {
-                resettableTableDecorator.resetModel();
+            if (MainPanel.this.table instanceof RowNumberTableDecorator decorator) {
+                decorator.reset();
             }
 
-            MainPanel.this.table = (Table) MainPanel.this.table.getComponent();
+            MainPanel.this.table = (Table) MainPanel.this.table.getTable();
             MainPanel.this.mainController.doDisplayData();
         }
     }
 
     private void createTable() {
         this.table = new SimpleTable();
-        final JScrollPane scrollPane = new JScrollPane(table.getComponent());
-        scrollPane.setPreferredSize(new Dimension(windowWidth, windowHeight));
-        this.add(scrollPane);
+        this.add(this.table.getContainer());
     }
 
     private void createMenuBar() {
-        final edu.ubb.tableeditor.view.menu.MenuBar menuBar = new MenuBar();
+        final var menuBar = new MenuBar();
 
         final JMenu mainMenu = menuBar.addMenu("Main Menu", KeyEvent.VK_M);
         final JMenu fileMenu = menuBar.addMenu("File", KeyEvent.VK_F);
         final JMenu othersMenu = menuBar.addMenu("Others", KeyEvent.VK_O);
         final JMenu helpMenu = menuBar.addMenu("Help", KeyEvent.VK_H);
 
-        menuBar.addItemToMenu(mainMenu.getText(), "Open Document", MainPanel.this::importData, true);
+        menuBar.addItemToMenu(mainMenu.getText(), "Open Document", this::importData, true);
+        menuBar.addItemToMenu(mainMenu.getText(), "Open Blank Document", this::createBlankData, true);
         exportItem = menuBar.addItemToMenu(mainMenu.getText(), "Export Table", e -> mainController.doExportData(), false);
         addRowBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Row", this::addNewRow, false);
         addColumnBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Column", this::addNewColumn, false);
@@ -146,17 +138,17 @@ public final class MainPanel extends JFrame {
         registerKeyShortcuts();
 
         this.setTitle("Table Editor");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setSize(windowWidth, windowHeight);
     }
 
     private void registerKeyShortcuts() {
-        this.getRootPane().registerKeyboardAction(e -> exportItem.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.getRootPane().registerKeyboardAction(e -> mainController.undoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.getRootPane().registerKeyboardAction(e -> mainController.redoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.getRootPane().registerKeyboardAction(e -> mainController.doSearch(), KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.getRootPane().registerKeyboardAction(e -> exportItem.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.getRootPane().registerKeyboardAction(e -> mainController.undoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.getRootPane().registerKeyboardAction(e -> mainController.redoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.getRootPane().registerKeyboardAction(e -> mainController.doSearch(), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     public void showError(String message) {
@@ -196,6 +188,10 @@ public final class MainPanel extends JFrame {
 
         final File selectedFile = chooser.getSelectedFile();
         mainController.doImportData(selectedFile.getAbsolutePath());
+    }
+
+    private void createBlankData(ActionEvent e) {
+        mainController.doCreateBlankData();
     }
 
     public Optional<File> saveData() {
@@ -249,12 +245,12 @@ public final class MainPanel extends JFrame {
     }
 
     public void selectCell(Position position) {
-        table.getComponent().setRowSelectionInterval(position.getRow(), position.getRow());
-        table.getComponent().setColumnSelectionInterval(position.getColumn(), position.getColumn());
+        table.getTable().setRowSelectionInterval(position.getRow(), position.getRow());
+        table.getTable().setColumnSelectionInterval(position.getColumn(), position.getColumn());
     }
 
     public void clearSelection() {
-        table.getComponent().clearSelection();
+        table.getTable().clearSelection();
     }
 
     public void showChart(JFreeChart chart) {

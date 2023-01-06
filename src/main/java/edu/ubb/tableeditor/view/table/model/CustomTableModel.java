@@ -12,6 +12,9 @@ public abstract class CustomTableModel extends DefaultTableModel {
     }
 
     @Override
+    public abstract Object getValueAt(int row, int column);
+
+    @Override
     public abstract void setValueAt(Object aValue, int rowIndex, int columnIndex);
 
     @Override

@@ -13,6 +13,11 @@ public abstract class TableModelDecorator extends CustomTableModel {
     }
 
     @Override
+    public final Object getValueAt(int rowIndex, int columnIndex) {
+        return this.tableModel.getValueAt(rowIndex, columnIndex);
+    }
+
+    @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         this.tableModel.setValueAt(aValue, rowIndex, columnIndex);
     }
@@ -40,11 +45,6 @@ public abstract class TableModelDecorator extends CustomTableModel {
     @Override
     public final Class<?> getColumnClass(int columnIndex) {
         return super.getColumnClass(columnIndex);
-    }
-
-    @Override
-    public final Object getValueAt(int rowIndex, int columnIndex) {
-        return super.getValueAt(rowIndex, columnIndex);
     }
 
     @Override

@@ -306,4 +306,9 @@ public final class MainController {
         }
     }
 
+    public void doCreateBlankData() {
+        this.data = new CsvData();
+        doDisplayData();
+    }
+
 }

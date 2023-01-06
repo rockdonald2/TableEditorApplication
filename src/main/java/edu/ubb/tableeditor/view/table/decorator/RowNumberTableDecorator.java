@@ -1,134 +1,152 @@
 package edu.ubb.tableeditor.view.table.decorator;
 
-import edu.ubb.tableeditor.command.PositionBasedCommand;
-import edu.ubb.tableeditor.controller.MainController;
-import edu.ubb.tableeditor.model.Position;
 import edu.ubb.tableeditor.view.table.Table;
-import edu.ubb.tableeditor.view.table.model.CustomTableModel;
-import edu.ubb.tableeditor.view.table.model.decorator.RowNumberedTableModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class RowNumberTableDecorator extends ProtectedFieldTableDecorator {
-
-    private String[][] data;
-    private String[] headers;
-    private boolean rowNumbersAdded;
-    private boolean resetCalled;
+public class RowNumberTableDecorator extends TableDecorator {
 
     public RowNumberTableDecorator(Table table) {
         super(table);
+
+        final JScrollPane container = table.getContainer();
+        final RowNumberTable numberedTable = new RowNumberTable(table.getTable());
+
+        container.setRowHeaderView(numberedTable);
+        container.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, numberedTable.getTableHeader());
     }
 
     @Override
-    public Position getProtectedPosition() {
-        return new Position(-1, 0);
+    public void reset() {
+        final JScrollPane container = super.getContainer();
+        container.setRowHeaderView(null);
+        container.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, null);
     }
 
-    @Override
-    public void displayData(CustomTableModel tableModel) {
-        getData(tableModel);
+    public static class RowNumberTable extends JTable implements ChangeListener, PropertyChangeListener, TableModelListener {
 
-        if (!rowNumbersAdded) {
-            addRowNumbers();
-            rowNumbersAdded = true;
-        } else {
-            updateRowNumbers();
+        private final JTable innerTable;
+
+        public RowNumberTable(JTable innerTable) {
+            this.innerTable = innerTable;
+            this.innerTable.addPropertyChangeListener(this);
+            this.innerTable.getModel().addTableModelListener(this);
+
+            this.setFocusable(false);
+            this.setAutoCreateColumnsFromModel(false);
+            this.setSelectionModel(this.innerTable.getSelectionModel());
+
+            this.getTableHeader().setReorderingAllowed(false);
+
+            TableColumn column = new TableColumn();
+            column.setHeaderValue(" ");
+            this.addColumn(column);
+            column.setCellRenderer(new RowNumberRenderer());
+
+            this.getColumnModel().getColumn(0).setPreferredWidth(50);
+            this.setPreferredScrollableViewportSize(getPreferredSize());
         }
 
-        super.displayData(this.constructModel(data, headers));
-    }
+        @Override
+        public void addNotify() {
+            super.addNotify();
 
-    private void getData(CustomTableModel tableModel) {
-        this.headers = new String[tableModel.getColumnCount()];
-        this.data = new String[tableModel.getRowCount()][this.headers.length];
-
-        IntStream.range(0, this.headers.length)
-                .forEach(idx -> headers[idx] = tableModel.getColumnName(idx));
-        IntStream.range(0, this.data.length)
-                .forEach(rowIdx -> IntStream.range(0, this.headers.length)
-                        .forEach(colIdx -> this.data[rowIdx][colIdx] = tableModel.getValueAt(rowIdx, colIdx).toString()));
-    }
-
-    private void addRowNumbers() {
-        if ("#".equals(MainController.instance().getColumnNameAt(0))) {
-            throw new IllegalStateException("Illegal to re-add row numbers");
+            Component c = getParent();
+            //  Keep scrolling of the row table in sync with the main table.
+            if (c instanceof JViewport viewport) {
+                viewport.addChangeListener(this);
+            }
         }
 
-        List<String> tmpHeaders = new ArrayList<>(Arrays.stream(headers).toList());
-        List<List<String>> tmpData = new ArrayList<>(Arrays.stream(data)
-                .toList()
-                .stream()
-                .map(elem -> new ArrayList<>(Arrays.stream(elem).toList()))
-                .toList());
-
-        tmpHeaders.add(0, "#");
-        IntStream.range(0, tmpData.size())
-                .forEach(idx -> tmpData.get(idx).add(0, String.valueOf(idx + 1)));
-
-        final MainController controller = MainController.instance();
-
-        this.headers = tmpHeaders.toArray(new String[]{});
-        controller.setHeaders(this.headers);
-
-        this.data = new String[tmpData.size()][tmpHeaders.size()];
-        IntStream.range(0, tmpData.size())
-                .forEach(idx -> {
-                    RowNumberTableDecorator.this.data[idx] = tmpData.get(idx).toArray(new String[]{});
-                    controller.addValueAt(idx, 0, tmpData.get(idx).get(0));
-                });
-
-        controller.updateCommands(PositionBasedCommand.Orientation.INCREASE, PositionBasedCommand.Which.COLUMN, 1);
-    }
-
-    private void updateRowNumbers() {
-        if (resetCalled) {
-            return;
-        } else if (!"#".equals(MainController.instance().getColumnNameAt(0))) {
-            throw new IllegalStateException("Illegal to update non-existing row numbers");
+        @Override
+        public int getRowCount() {
+            return innerTable.getRowCount();
         }
 
-        List<List<String>> tmpData = new ArrayList<>(Arrays.stream(data)
-                .toList()
-                .stream()
-                .map(elem -> new ArrayList<>(Arrays.stream(elem).toList()))
-                .toList());
+        @Override
+        public int getRowHeight(int row) {
+            int rowHeight = innerTable.getRowHeight(row);
 
-        IntStream.range(0, tmpData.size())
-                .forEach(idx -> tmpData.get(idx).set(0, String.valueOf(idx + 1)));
+            if (rowHeight != super.getRowHeight(row)) {
+                super.setRowHeight(row, rowHeight);
+            }
 
-        final MainController controller = MainController.instance();
+            return rowHeight;
+        }
 
-        this.data = new String[tmpData.size()][headers.length];
-        IntStream.range(0, tmpData.size())
-                .forEach(idx -> {
-                    RowNumberTableDecorator.this.data[idx] = tmpData.get(idx).toArray(new String[]{});
-                    controller.setValueAt(idx, 0, tmpData.get(idx).get(0));
-                });
-    }
+        @Override
+        public Object getValueAt(int row, int column) {
+            return Integer.toString(row + 1);
+        }
 
-    @Override
-    public CustomTableModel constructModel(String[][] data, String[] headers) {
-        final CustomTableModel tableModel = new RowNumberedTableModel(super.constructModel(data, headers));
-        tableModel.setDataVector(data, headers);
-        return tableModel;
-    }
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
 
-    @Override
-    public void resetModel() {
-        final MainController controller = MainController.instance();
+        public void stateChanged(ChangeEvent e) {
+            JViewport viewport = (JViewport) e.getSource();
+            JScrollPane scrollPane = (JScrollPane) viewport.getParent();
+            scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
+        }
 
-        if ("#".equals(controller.getColumnNameAt(0))) {
-            resetCalled = true;
+        public void propertyChange(PropertyChangeEvent e) {
+            if ("selectionModel".equals(e.getPropertyName())) {
+                setSelectionModel(innerTable.getSelectionModel());
+            }
 
-            controller.doDeleteColumnAt(0);
-            controller.updateCommands(PositionBasedCommand.Orientation.DECREASE, PositionBasedCommand.Which.COLUMN, 1);
+            if ("rowHeight".equals(e.getPropertyName())) {
+                repaint();
+            }
 
-            rowNumbersAdded = false;
-            resetCalled = false;
+            if ("model".equals(e.getPropertyName())) {
+                innerTable.getModel().addTableModelListener(this);
+                revalidate();
+            }
+        }
+
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            revalidate();
+        }
+
+        private static class RowNumberRenderer extends DefaultTableCellRenderer {
+            public RowNumberRenderer() {
+                setHorizontalAlignment(SwingConstants.CENTER);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (table != null) {
+                    JTableHeader header = table.getTableHeader();
+
+                    if (header != null) {
+                        setForeground(header.getForeground());
+                        setBackground(header.getBackground());
+                        setFont(header.getFont());
+                    }
+                }
+
+                if (isSelected) {
+                    setFont(getFont().deriveFont(Font.BOLD));
+                }
+
+                setText((value == null) ? "" : value.toString());
+                setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+
+                return this;
+            }
         }
     }
 

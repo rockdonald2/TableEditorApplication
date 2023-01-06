@@ -1,13 +1,10 @@
 package edu.ubb.tableeditor.service.export.json;
 
 import edu.ubb.tableeditor.model.Field;
-import edu.ubb.tableeditor.model.TextField;
-import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.export.ExportVisitor;
 import edu.ubb.tableeditor.service.export.Exporter;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JsonExporter extends Exporter {

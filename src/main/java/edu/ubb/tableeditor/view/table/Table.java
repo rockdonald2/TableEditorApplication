@@ -6,7 +6,9 @@ import javax.swing.*;
 
 public interface Table {
 
-    JTable getComponent();
+    JScrollPane getContainer();
+
+    JTable getTable();
 
     void displayData(CustomTableModel tableModel);
 
