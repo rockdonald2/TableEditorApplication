@@ -1,6 +1,8 @@
 package edu.ubb.tableeditor.view;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.fonts.inter.FlatInterFont;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import edu.ubb.tableeditor.annotation.Flag;
 import edu.ubb.tableeditor.annotation.Singleton;
 import edu.ubb.tableeditor.command.AddColumnCommand;
@@ -48,6 +50,7 @@ public final class MainPanel extends JFrame {
     private JMenuItem addRowBtn;
     private JMenuItem addColumnBtn;
     private JMenuItem exportItem;
+    private JMenuItem openBtn;
     private JCheckBoxMenuItem rowDecoratorBtn;
     private JCheckBoxMenuItem formulaDecoratorBtn;
     private JMenuItem findBtn;
@@ -70,7 +73,11 @@ public final class MainPanel extends JFrame {
     }
 
     public void init() {
-        FlatLightLaf.setup(); // look-and-feel
+        FlatInterFont.install();
+        FlatLaf.setPreferredFontFamily(FlatInterFont.FAMILY);
+        FlatLaf.setPreferredLightFontFamily(FlatInterFont.FAMILY_LIGHT);
+        FlatLaf.setPreferredSemiboldFontFamily(FlatInterFont.FAMILY_SEMIBOLD);
+        FlatMacLightLaf.setup();
 
         if (initialized) {
             throw new IllegalStateException(String.format("%s already initialized", MainPanel.class.getName()));
@@ -133,21 +140,21 @@ public final class MainPanel extends JFrame {
     private void createMenuBar() {
         final var menuBar = new MenuBar();
 
-        final JMenu mainMenu = menuBar.addMenu("Main Menu", KeyEvent.VK_M);
-        final JMenu fileMenu = menuBar.addMenu("File", KeyEvent.VK_F);
+        final JMenu mainMenu = menuBar.addMenu("File", KeyEvent.VK_M);
+        final JMenu fileMenu = menuBar.addMenu("Edit", KeyEvent.VK_F);
         final JMenu othersMenu = menuBar.addMenu("Others", KeyEvent.VK_O);
         final JMenu helpMenu = menuBar.addMenu("Help", KeyEvent.VK_H);
 
-        menuBar.addItemToMenu(mainMenu.getText(), "Open Document", this::importData, true);
-        menuBar.addItemToMenu(mainMenu.getText(), "Open Blank Document", this::createBlankData, true);
-        exportItem = menuBar.addItemToMenu(mainMenu.getText(), "Export Table", e -> mainController.doExportData(), false);
+        openBtn = menuBar.addItemToMenu(mainMenu.getText(), "Open...", this::importData, true);
+        menuBar.addItemToMenu(mainMenu.getText(), "Create...", this::createBlankData, true);
+        exportItem = menuBar.addItemToMenu(mainMenu.getText(), "Save As...", e -> mainController.doExportData(), false);
         addRowBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Row", this::addNewRow, false);
         addColumnBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Column", this::addNewColumn, false);
         findBtn = menuBar.addItemToMenu(fileMenu.getText(), "Find Cell", e -> mainController.doSearch(), false);
-        rowDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Add Row Numbering", this::toggleRowNumbering, false);
+        rowDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Row Numbering", this::toggleRowNumbering, false);
         formulaDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Formulas", this::toggleFormulas, false);
 
-        menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("Keyboard shortcuts:\n\nCTRL-F: to search within the table\nCTRL-S: save the table\nCTRL-Z: undo changes\nCTRL-R: redo changes"), true);
+        menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("Keyboard shortcuts:\n\nCTRL-F: to search within the table\nCTRL-S: save the table\nCTRL-Z: undo changes\nCTRL-R: redo changes\nCTRL-O: open document"), true);
 
         this.setJMenuBar(menuBar);
     }
@@ -163,10 +170,17 @@ public final class MainPanel extends JFrame {
     }
 
     private void registerKeyShortcuts() {
+        this.getRootPane().registerKeyboardAction(e -> openBtn.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        openBtn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
+
         this.getRootPane().registerKeyboardAction(e -> exportItem.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+
         this.getRootPane().registerKeyboardAction(e -> mainController.undoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
         this.getRootPane().registerKeyboardAction(e -> mainController.redoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.getRootPane().registerKeyboardAction(e -> mainController.doSearch(), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        this.getRootPane().registerKeyboardAction(e -> findBtn.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        findBtn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
     }
 
     public void showError(String message) {

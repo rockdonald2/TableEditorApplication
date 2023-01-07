@@ -1,13 +1,12 @@
 package edu.ubb.tableeditor.view.table.model.decorator;
 
 import com.ezylang.evalex.BaseException;
-import com.ezylang.evalex.EvaluationException;
 import com.ezylang.evalex.Expression;
 import com.ezylang.evalex.config.ExpressionConfiguration;
 import com.ezylang.evalex.parser.ParseException;
-import edu.ubb.tableeditor.controller.MainController;
 import edu.ubb.tableeditor.view.MainPanel;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
+import edu.ubb.tableeditor.view.table.model.decorator.functions.CountFunction;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,7 +26,8 @@ public class FormulaCapableTableModel extends TableModelDecorator {
                 .implicitMultiplicationAllowed(true)
                 .stripTrailingZeros(true)
                 .structuresAllowed(false)
-                .build();
+                .build()
+                .withAdditionalFunctions(Map.entry("COUNT", new CountFunction()));
     }
 
     @Override
