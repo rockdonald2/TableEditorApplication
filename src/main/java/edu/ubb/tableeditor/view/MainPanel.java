@@ -18,7 +18,9 @@ import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
 import edu.ubb.tableeditor.view.table.SimpleTable;
 import edu.ubb.tableeditor.view.table.Table;
+import edu.ubb.tableeditor.view.table.decorator.FormulaCapableTableDecorator;
 import edu.ubb.tableeditor.view.table.decorator.RowNumberTableDecorator;
+import edu.ubb.tableeditor.view.table.decorator.TableDecorator;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
@@ -47,6 +49,7 @@ public final class MainPanel extends JFrame {
     private JMenuItem addColumnBtn;
     private JMenuItem exportItem;
     private JCheckBoxMenuItem rowDecoratorBtn;
+    private JCheckBoxMenuItem formulaDecoratorBtn;
     private JMenuItem findBtn;
     @Flag
     private boolean initialized;
@@ -99,7 +102,21 @@ public final class MainPanel extends JFrame {
             MainPanel.this.table = new RowNumberTableDecorator(MainPanel.this.table);
             MainPanel.this.mainController.doDisplayData();
         } else {
-            if (MainPanel.this.table instanceof RowNumberTableDecorator decorator) {
+            if (MainPanel.this.table instanceof final TableDecorator decorator) {
+                decorator.reset();
+            }
+
+            MainPanel.this.table = (Table) MainPanel.this.table.getTable();
+            MainPanel.this.mainController.doDisplayData();
+        }
+    }
+
+    private void toggleFormulas(ActionEvent e) {
+        if (((AbstractButton) e.getSource()).isSelected()) {
+            MainPanel.this.table = new FormulaCapableTableDecorator(MainPanel.this.table);
+            MainPanel.this.mainController.doDisplayData();
+        } else {
+            if (MainPanel.this.table instanceof final TableDecorator decorator) {
                 decorator.reset();
             }
 
@@ -128,6 +145,7 @@ public final class MainPanel extends JFrame {
         addColumnBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Column", this::addNewColumn, false);
         findBtn = menuBar.addItemToMenu(fileMenu.getText(), "Find Cell", e -> mainController.doSearch(), false);
         rowDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Add Row Numbering", this::toggleRowNumbering, false);
+        formulaDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Formulas", this::toggleFormulas, false);
 
         menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("Keyboard shortcuts:\n\nCTRL-F: to search within the table\nCTRL-S: save the table\nCTRL-Z: undo changes\nCTRL-R: redo changes"), true);
 
@@ -173,6 +191,7 @@ public final class MainPanel extends JFrame {
         addColumnBtn.setEnabled(true);
         exportItem.setEnabled(true);
         rowDecoratorBtn.setEnabled(true);
+        formulaDecoratorBtn.setEnabled(true);
         findBtn.setEnabled(true);
     }
 

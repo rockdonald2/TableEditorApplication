@@ -45,7 +45,6 @@ public class RowNumberTableDecorator extends TableDecorator {
             this.setFocusable(false);
             this.setAutoCreateColumnsFromModel(false);
             this.setSelectionModel(this.innerTable.getSelectionModel());
-
             this.getTableHeader().setReorderingAllowed(false);
 
             TableColumn column = new TableColumn();

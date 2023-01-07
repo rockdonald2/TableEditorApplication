@@ -1,1 +1,14 @@
-[{"clientName": "Lukacs Zsolt","clientEmail": "lukacs.zsolt@email.com","clientTel": "+40074323213","clientAge": 22},{"clientName": "Lukacs Csaba","clientEmail": "lukacs.csaba@email.com","clientTel": "+40074323213","clientAge": 29}]
+[
+  {
+    "clientName": "Lukacs Zsolt",
+    "clientEmail": "lukacs.zsolt@email.com",
+    "clientTel": "+40074323213",
+    "clientAge": 22
+  },
+  {
+    "clientName": "Lukacs Csaba",
+    "clientEmail": "lukacs.csaba@email.com",
+    "clientTel": "+40074323213",
+    "clientAge": 25
+  }
+]

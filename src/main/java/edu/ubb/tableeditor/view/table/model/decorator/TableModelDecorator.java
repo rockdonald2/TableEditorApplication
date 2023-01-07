@@ -3,6 +3,7 @@ package edu.ubb.tableeditor.view.table.model.decorator;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
 import javax.swing.event.TableModelListener;
+import java.util.Vector;
 
 public abstract class TableModelDecorator extends CustomTableModel {
 
@@ -10,10 +11,11 @@ public abstract class TableModelDecorator extends CustomTableModel {
 
     protected TableModelDecorator(CustomTableModel tableModel) {
         this.tableModel = tableModel;
+        this.setDataVector(getDataVector(), getColumnIdentifiers());
     }
 
     @Override
-    public final Object getValueAt(int rowIndex, int columnIndex) {
+    public Object getValueAt(int rowIndex, int columnIndex) {
         return this.tableModel.getValueAt(rowIndex, columnIndex);
     }
 
@@ -28,33 +30,13 @@ public abstract class TableModelDecorator extends CustomTableModel {
     }
 
     @Override
-    public final int getRowCount() {
-        return super.getRowCount();
+    public Vector<Vector> getDataVector() {
+        return this.tableModel.getDataVector();
     }
 
     @Override
-    public final int getColumnCount() {
-        return super.getColumnCount();
-    }
-
-    @Override
-    public final String getColumnName(int columnIndex) {
-        return super.getColumnName(columnIndex);
-    }
-
-    @Override
-    public final Class<?> getColumnClass(int columnIndex) {
-        return super.getColumnClass(columnIndex);
-    }
-
-    @Override
-    public final void addTableModelListener(TableModelListener l) {
-        super.addTableModelListener(l);
-    }
-
-    @Override
-    public final void removeTableModelListener(TableModelListener l) {
-        super.removeTableModelListener(l);
+    public Vector getColumnIdentifiers() {
+        return this.tableModel.getColumnIdentifiers();
     }
 
 }
