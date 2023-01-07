@@ -3,12 +3,12 @@ package edu.ubb.tableeditor.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CsvData implements Data {
+public class BaseData implements Data {
 
     private List<String> headers;
     private List<List<String>> data;
 
-    public CsvData() {
+    public BaseData() {
         this.headers = new ArrayList<>();
         this.data = new ArrayList<>();
     }

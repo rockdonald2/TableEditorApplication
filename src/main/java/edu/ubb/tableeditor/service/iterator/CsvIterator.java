@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CsvIterator implements Iterator<List<String>> {
 
@@ -14,6 +15,8 @@ public class CsvIterator implements Iterator<List<String>> {
     private final java.util.Iterator<String> iterator;
 
     public CsvIterator(Path inputFile) throws IOException {
+        Objects.requireNonNull(inputFile);
+
         try (BufferedReader tmp = new BufferedReader(new FileReader(inputFile.toFile()))) {
             this.iterator = tmp.lines().toList().iterator();
         }

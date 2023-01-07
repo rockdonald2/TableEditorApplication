@@ -6,6 +6,7 @@ import edu.ubb.tableeditor.service.export.Exporter;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 public class JsonExporter extends Exporter {
 
@@ -19,7 +20,10 @@ public class JsonExporter extends Exporter {
         AtomicInteger fieldIdx = new AtomicInteger(0);
         AtomicInteger elemIdx = new AtomicInteger(0);
 
-        exportedData.append("[");
+        exportedData.append("{");
+        exportedData.append("\"headers\": ").append(headers.stream().map(header -> String.format("\"%s\"", header)).toList()).append(",");
+
+        exportedData.append("\"data\": ").append("[");
         rowData.forEach(row -> {
             exportedData.append("{");
             fieldIdx.set(0);
@@ -47,6 +51,7 @@ public class JsonExporter extends Exporter {
         });
 
         exportedData.append("]");
+        exportedData.append("}");
     }
 
 }

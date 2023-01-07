@@ -211,7 +211,11 @@ public final class MainPanel extends JFrame {
 
     private void importData(ActionEvent e) {
         final JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new FileNameExtensionFilter("CSV (*.csv)", "csv"));
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("CSV (*.csv)", "csv"));
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("JSON (*.json)", "json"));
+
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         int hasOpened = chooser.showOpenDialog(MainPanel.this);
 
@@ -227,7 +231,7 @@ public final class MainPanel extends JFrame {
         mainController.doCreateBlankData();
     }
 
-    public Optional<File> saveData() {
+    public Optional<File> showSavePanel() {
         final JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         chooser.setFileFilter(new FileNameExtensionFilter("JSON (*.json)", "json"));

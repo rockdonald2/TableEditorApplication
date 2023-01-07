@@ -1,11 +1,10 @@
-package edu.ubb.tableeditor.service.loader.csv;
+package edu.ubb.tableeditor.service.loader;
 
-import edu.ubb.tableeditor.model.CsvData;
+import edu.ubb.tableeditor.model.BaseData;
 import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.iterator.CsvIterator;
 import edu.ubb.tableeditor.service.iterator.Iterator;
-import edu.ubb.tableeditor.service.loader.Importer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +16,7 @@ public class CsvImporter implements Importer {
 
     @Override
     public Data importData(String fileName) throws ServiceException {
-        final Data data = new CsvData();
+        final Data data = new BaseData();
         final Path file = Path.of(fileName);
 
         if (Files.notExists(file)) {

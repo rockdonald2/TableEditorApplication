@@ -4,14 +4,15 @@ import edu.ubb.tableeditor.annotation.Flag;
 import edu.ubb.tableeditor.annotation.Singleton;
 import edu.ubb.tableeditor.command.Command;
 import edu.ubb.tableeditor.command.PositionBasedCommand;
-import edu.ubb.tableeditor.model.CsvData;
+import edu.ubb.tableeditor.model.BaseData;
 import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.model.Position;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.export.Exporter;
 import edu.ubb.tableeditor.service.export.json.JsonExporter;
+import edu.ubb.tableeditor.service.loader.CsvImporter;
 import edu.ubb.tableeditor.service.loader.Importer;
-import edu.ubb.tableeditor.service.loader.csv.CsvImporter;
+import edu.ubb.tableeditor.service.loader.JSONImporter;
 import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.sort.DefaultSortStrategy;
 import edu.ubb.tableeditor.utils.Util;
@@ -55,7 +56,7 @@ public final class MainController {
             throw new IllegalStateException(String.format("%s already initialized", MainPanel.class.getName()));
         }
 
-        this.data = new CsvData();
+        this.data = new BaseData();
         this.mainPanel = MainPanel.instance();
         this.mainPanel.init();
         initialized = true;
@@ -89,6 +90,8 @@ public final class MainController {
         Importer importer = null;
         if ("csv".equals(extension.get())) {
             importer = new CsvImporter();
+        } else if ("json".equals(extension.get())) {
+            importer = new JSONImporter();
         }
 
         if (importer == null) {
@@ -104,7 +107,7 @@ public final class MainController {
 
     public void doExportData() {
         try {
-            Optional<File> optionalSaveFile = mainPanel.saveData();
+            Optional<File> optionalSaveFile = mainPanel.showSavePanel();
 
             if (optionalSaveFile.isEmpty()) return;
 
@@ -307,7 +310,7 @@ public final class MainController {
     }
 
     public void doCreateBlankData() {
-        this.data = new CsvData();
+        this.data = new BaseData();
         doDisplayData();
     }
 
