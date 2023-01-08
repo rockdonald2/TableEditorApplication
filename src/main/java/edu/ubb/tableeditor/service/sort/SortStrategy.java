@@ -1,6 +1,6 @@
 package edu.ubb.tableeditor.service.sort;
 
-import edu.ubb.tableeditor.model.Data;
+import edu.ubb.tableeditor.model.data.Data;
 
 public interface SortStrategy {
 

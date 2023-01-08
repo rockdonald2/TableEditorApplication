@@ -1,6 +1,6 @@
 package edu.ubb.tableeditor.service.loader;
 
-import edu.ubb.tableeditor.model.Data;
+import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.iterator.Iterator;
 import edu.ubb.tableeditor.service.iterator.JsonArrayIterator;
@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class JsonImporter implements Importer {
@@ -38,6 +40,7 @@ public class JsonImporter implements Importer {
 
         List<String> headers = new ArrayList<>();
         List<List<String>> rowData = new ArrayList<>();
+        List<Map.Entry<String, List<String>>> restrictions = new ArrayList<>();
 
         IntStream.range(0, jsonHeaders.length()).forEach(idx -> {
             headers.add(jsonHeaders.getRawValue(idx).get());
@@ -66,6 +69,20 @@ public class JsonImporter implements Importer {
 
         data.setHeaders(headers);
         data.setData(rowData);
+
+        Optional<JsonObject> jsonRestrictions = object.getJsonObject("valueRestrictions");
+        jsonRestrictions.ifPresent(jsonObject -> headers.forEach(header -> {
+            jsonObject.getJsonArray(header).ifPresent(arr -> {
+                List<String> restrictionsForColumn = new ArrayList<>(arr.length());
+
+                IntStream.range(0, arr.length())
+                        .forEach(idx -> restrictionsForColumn.add(arr.getRawValue(idx).get()));
+
+                restrictions.add(Map.entry(header, restrictionsForColumn));
+            });
+        }));
+
+        data.setValueRestrictions(restrictions);
 
         return data;
     }

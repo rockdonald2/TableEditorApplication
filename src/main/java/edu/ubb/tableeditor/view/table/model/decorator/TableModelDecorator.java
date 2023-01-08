@@ -2,6 +2,8 @@ package edu.ubb.tableeditor.view.table.model.decorator;
 
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 public abstract class TableModelDecorator extends CustomTableModel {
@@ -36,6 +38,16 @@ public abstract class TableModelDecorator extends CustomTableModel {
     @Override
     public Vector getColumnIdentifiers() {
         return this.tableModel.getColumnIdentifiers();
+    }
+
+    @Override
+    public List<Map.Entry<String, List<String>>> getValueRestrictions() {
+        return this.tableModel.getValueRestrictions();
+    }
+
+    @Override
+    public void setValueRestrictions(List<Map.Entry<String, List<String>>> valueRestrictions) {
+        this.tableModel.setValueRestrictions(valueRestrictions);
     }
 
 }

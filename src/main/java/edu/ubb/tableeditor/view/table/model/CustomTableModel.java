@@ -1,9 +1,10 @@
 package edu.ubb.tableeditor.view.table.model;
 
-import edu.ubb.tableeditor.model.Data;
+import edu.ubb.tableeditor.model.data.Data;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.stream.IntStream;
 
@@ -40,5 +41,9 @@ public abstract class CustomTableModel extends DefaultTableModel {
     public Vector getColumnIdentifiers() {
         return super.columnIdentifiers;
     }
+
+    public abstract List<Map.Entry<String, List<String>>> getValueRestrictions();
+
+    public abstract void setValueRestrictions(List<Map.Entry<String, List<String>>> valueRestrictions);
 
 }

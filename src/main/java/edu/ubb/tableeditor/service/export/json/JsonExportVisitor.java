@@ -1,9 +1,9 @@
 package edu.ubb.tableeditor.service.export.json;
 
-import edu.ubb.tableeditor.model.DecimalField;
-import edu.ubb.tableeditor.model.IntegerField;
-import edu.ubb.tableeditor.model.PhoneNumberField;
-import edu.ubb.tableeditor.model.TextField;
+import edu.ubb.tableeditor.model.field.DecimalField;
+import edu.ubb.tableeditor.model.field.IntegerField;
+import edu.ubb.tableeditor.model.field.PhoneNumberField;
+import edu.ubb.tableeditor.model.field.TextField;
 import edu.ubb.tableeditor.service.export.ExportVisitor;
 
 import java.math.BigDecimal;

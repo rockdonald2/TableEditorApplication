@@ -3,17 +3,16 @@ package edu.ubb.tableeditor.view.table;
 import edu.ubb.tableeditor.command.RemoveColumnCommand;
 import edu.ubb.tableeditor.command.RemoveRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
-import edu.ubb.tableeditor.model.Data;
-import edu.ubb.tableeditor.model.Position;
+import edu.ubb.tableeditor.model.data.Data;
+import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.view.diagrams.BarChartStrategy;
 import edu.ubb.tableeditor.view.diagrams.PieChartStrategy;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
-import edu.ubb.tableeditor.view.table.model.SimpleTableModel;
+import edu.ubb.tableeditor.view.table.model.BasicTableModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -21,15 +20,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
 
-public class SimpleTable extends JTable implements Table {
+public class JTableImpl extends JTable implements Table {
 
     private final JScrollPane container;
 
-    public SimpleTable() {
+    public JTableImpl() {
         int windowWidth = PropertiesContext.getIntProperty("window.size.width");
         int windowHeight = PropertiesContext.getIntProperty("window.size.height");
 
-        this.setModel(this.constructModel(Data.get()));
+        this.setModel(this.defineModel(Data.get()));
         this.getTableHeader().setReorderingAllowed(false);
 
         this.container = new JScrollPane(getTable());
@@ -152,13 +151,13 @@ public class SimpleTable extends JTable implements Table {
     }
 
     private int getRowAtPoint(JComponent accordingTo) {
-        Point point = SwingUtilities.convertPoint(accordingTo, new Point(0, 0), SimpleTable.this);
-        return SimpleTable.this.rowAtPoint(point);
+        Point point = SwingUtilities.convertPoint(accordingTo, new Point(0, 0), JTableImpl.this);
+        return JTableImpl.this.rowAtPoint(point);
     }
 
     private int getColumnAtPoint(JComponent accordingTo) {
-        Point point = SwingUtilities.convertPoint(accordingTo, new Point(0, 0), SimpleTable.this);
-        return SimpleTable.this.columnAtPoint(point);
+        Point point = SwingUtilities.convertPoint(accordingTo, new Point(0, 0), JTableImpl.this);
+        return JTableImpl.this.columnAtPoint(point);
     }
 
     @Override
@@ -177,8 +176,8 @@ public class SimpleTable extends JTable implements Table {
     }
 
     @Override
-    public CustomTableModel constructModel(Data data) {
-        return new SimpleTableModel(data);
+    public CustomTableModel defineModel(Data data) {
+        return new BasicTableModel(data);
     }
 
 }

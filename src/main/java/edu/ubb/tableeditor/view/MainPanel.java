@@ -8,8 +8,8 @@ import edu.ubb.tableeditor.annotation.Singleton;
 import edu.ubb.tableeditor.command.AddColumnCommand;
 import edu.ubb.tableeditor.command.AddRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
-import edu.ubb.tableeditor.model.Data;
-import edu.ubb.tableeditor.model.Position;
+import edu.ubb.tableeditor.model.data.Data;
+import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.service.search.MatchCaseSearchStrategy;
 import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.search.SubStringSearchStrategy;
@@ -19,11 +19,11 @@ import edu.ubb.tableeditor.utils.input.IOFile;
 import edu.ubb.tableeditor.view.button.SearchRadioButton;
 import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
-import edu.ubb.tableeditor.view.table.SimpleTable;
+import edu.ubb.tableeditor.view.table.JTableImpl;
 import edu.ubb.tableeditor.view.table.Table;
 import edu.ubb.tableeditor.view.table.decorator.FormulaCapableTableDecorator;
 import edu.ubb.tableeditor.view.table.decorator.RowNumberTableDecorator;
-import edu.ubb.tableeditor.view.table.decorator.TableDecorator;
+import edu.ubb.tableeditor.view.table.decorator.ValueRestrictedTableDecorator;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
@@ -33,12 +33,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Singleton
 public final class MainPanel extends JFrame {
 
+    public static final String TOGGLE_FORMULAS = "Toggle Formulas";
+    public static final String TOGGLE_ROW_NUMBERING = "Toggle Row Numbering";
     private static MainPanel instance;
 
     private final MainController mainController;
@@ -49,9 +50,11 @@ public final class MainPanel extends JFrame {
     private JMenuItem addColumnBtn;
     private JMenuItem exportItem;
     private JMenuItem openBtn;
-    private JCheckBoxMenuItem rowDecoratorBtn;
-    private JCheckBoxMenuItem formulaDecoratorBtn;
     private JMenuItem findBtn;
+    private Optional<JMenuItem> valueRestrictionsPanelBtn = Optional.empty();
+
+    private java.util.List<JCheckBoxMenuItem> decoratorBtns = new ArrayList<>();
+
     @Flag
     private boolean initialized;
 
@@ -81,8 +84,8 @@ public final class MainPanel extends JFrame {
             throw new IllegalStateException(String.format("%s already initialized", MainPanel.class.getName()));
         }
 
-        createMenuBar();
-        createTable();
+        this.setJMenuBar(createMenuBar());
+        this.add(createTable().getContainer());
         baseConfig();
         initialized = true;
     }
@@ -104,8 +107,8 @@ public final class MainPanel extends JFrame {
 
     private void toggleRowNumbering(ActionEvent e) {
         if (((AbstractButton) e.getSource()).isSelected()) {
-            MainPanel.this.table = new RowNumberTableDecorator(MainPanel.this.table);
-            MainPanel.this.mainController.doDisplayData();
+            this.table = new RowNumberTableDecorator(this.table);
+            this.mainController.doDisplayData();
         } else {
             resetDecorator();
         }
@@ -113,29 +116,45 @@ public final class MainPanel extends JFrame {
 
     private void toggleFormulas(ActionEvent e) {
         if (((AbstractButton) e.getSource()).isSelected()) {
-            MainPanel.this.table = new FormulaCapableTableDecorator(MainPanel.this.table);
-            MainPanel.this.mainController.doDisplayData();
+            this.table = new FormulaCapableTableDecorator(this.table);
+            this.mainController.doDisplayData();
         } else {
             resetDecorator();
         }
     }
 
     private void resetDecorator() {
-        if (MainPanel.this.table instanceof final TableDecorator decorator) {
-            decorator.reset();
+        this.remove(this.table.getContainer());
+        this.table = createTable();
+
+        decoratorBtns.forEach(btn -> {
+            if (btn.isSelected()) {
+                switch (btn.getText()) {
+                    case TOGGLE_FORMULAS -> this.table = new FormulaCapableTableDecorator(this.table);
+                    case TOGGLE_ROW_NUMBERING -> this.table = new RowNumberTableDecorator(this.table);
+                }
+            }
+        });
+
+        this.mainController.doDisplayData();
+        this.add(this.table.getContainer());
+
+        this.repaint();
+        this.validate();
+    }
+
+    private Table createTable() {
+        if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED)) {
+            this.table = new ValueRestrictedTableDecorator(new JTableImpl());
+        } else if (Data.getFormat().equals(Data.DataFormat.BASIC)) {
+            this.table = new JTableImpl();
         }
 
-        MainPanel.this.table = (Table) MainPanel.this.table.getTable();
-        MainPanel.this.mainController.doDisplayData();
+        return this.table;
     }
 
-    private void createTable() {
-        this.table = new SimpleTable();
-        this.add(this.table.getContainer());
-    }
-
-    private void createMenuBar() {
-        final var menuBar = new MenuBar();
+    private MenuBar createMenuBar() {
+        final MenuBar menuBar = new MenuBar();
 
         final JMenu mainMenu = menuBar.addMenu("File", KeyEvent.VK_M);
         final JMenu fileMenu = menuBar.addMenu("Edit", KeyEvent.VK_F);
@@ -147,13 +166,18 @@ public final class MainPanel extends JFrame {
         exportItem = menuBar.addItemToMenu(mainMenu.getText(), "Save As...", e -> mainController.doExportData(), false);
         addRowBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Row", this::addNewRow, false);
         addColumnBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Column", this::addNewColumn, false);
-        findBtn = menuBar.addItemToMenu(fileMenu.getText(), "Find Cell", e -> mainController.doSearch(), false);
-        rowDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Row Numbering", this::toggleRowNumbering, false);
-        formulaDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Formulas", this::toggleFormulas, false);
+        findBtn = menuBar.addItemToMenu(fileMenu.getText(), "Find Cell...", e -> mainController.doSearch(), false);
+
+        decoratorBtns.add(menuBar.addToggleItemToMenu(othersMenu.getText(), TOGGLE_ROW_NUMBERING, this::toggleRowNumbering, false));
+        decoratorBtns.add(menuBar.addToggleItemToMenu(othersMenu.getText(), TOGGLE_FORMULAS, this::toggleFormulas, false));
 
         menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("<html><h3>Keyboard shortcuts</h3><p>CTRL-F: to search within the table</p>CTRL-S save the table<p>CTRL-Z: undo changes</p><p>CTRL-R redo changes</p><p>CTRL-O: open document</p></html>"), true);
 
-        this.setJMenuBar(menuBar);
+        if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED)) { // if enabled
+            valueRestrictionsPanelBtn = Optional.of(menuBar.addItemToMenu(fileMenu.getText(), "Specify Value Restrictions...", this::triggerValueRestrictionsPanel, false));
+        }
+
+        return menuBar;
     }
 
     private void baseConfig() {
@@ -189,14 +213,16 @@ public final class MainPanel extends JFrame {
     }
 
     public void displayData(Data data) {
-        table.displayData(table.constructModel(data));
+        table.displayData(table.defineModel(data));
 
         addRowBtn.setEnabled(true);
         addColumnBtn.setEnabled(true);
         exportItem.setEnabled(true);
-        rowDecoratorBtn.setEnabled(true);
-        formulaDecoratorBtn.setEnabled(true);
+        decoratorBtns.forEach(btn -> btn.setEnabled(true));
         findBtn.setEnabled(true);
+
+        // optional features
+        valueRestrictionsPanelBtn.ifPresent(jMenuItem -> jMenuItem.setEnabled(true));
     }
 
     private void showImportPanel(ActionEvent e) {
@@ -218,9 +244,10 @@ public final class MainPanel extends JFrame {
 
     private void createBlankData(ActionEvent e) {
         mainController.doCreateBlankData();
+        mainController.doDisplayData();
     }
 
-    public Optional<File> showSavePanel() {
+    public Optional<File> showSavePanelAndGetFile() {
         final JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         chooser.setAcceptAllFileFilterUsed(false);
@@ -256,7 +283,7 @@ public final class MainPanel extends JFrame {
 
         mainSearchPanel.add(subSearchPanel);
 
-        String searchWord = JOptionPane.showInputDialog(null, mainSearchPanel);
+        String searchWord = JOptionPane.showInputDialog(this, mainSearchPanel);
 
         if (searchWord == null || searchWord.isBlank()) {
             return Optional.empty();
@@ -273,12 +300,12 @@ public final class MainPanel extends JFrame {
         throw new ViewException("No search radio button selected");
     }
 
-    public void selectCell(Position position) {
+    public void selectTableCell(Position position) {
         table.getTable().setRowSelectionInterval(position.getRow(), position.getRow());
         table.getTable().setColumnSelectionInterval(position.getColumn(), position.getColumn());
     }
 
-    public void clearSelection() {
+    public void clearTableSelection() {
         table.getTable().clearSelection();
     }
 
@@ -289,6 +316,28 @@ public final class MainPanel extends JFrame {
         chartFrame.setLocationRelativeTo(null);
         chartFrame.setSize(windowWidth, windowHeight);
         chartFrame.setVisible(true);
+    }
+
+    private void triggerValueRestrictionsPanel(ActionEvent e) {
+        mainController.doSetValueRestrictions();
+    }
+
+    public void showValueRestrictionsPanel(Data data) {
+        final JComboBox<String> headers = new JComboBox<>();
+        headers.setToolTipText("Select column header");
+        data.getHeaders().forEach(headers::addItem);
+
+        final JPanel restrictionsPanel = new JPanel(new GridLayout(2, 1));
+        restrictionsPanel.add(new JLabel("Specify possible values comma-separated"));
+        restrictionsPanel.add(headers);
+
+        String possibleValues = JOptionPane.showInputDialog(this, restrictionsPanel, "Specify Value Restrictions", JOptionPane.QUESTION_MESSAGE);
+
+        if (possibleValues == null || possibleValues.isBlank()) {
+            return;
+        }
+
+        mainController.addValueRestriction(Objects.requireNonNull(headers.getSelectedItem()).toString(), Arrays.stream(possibleValues.split(",")).map(String::trim).toList());
     }
 
 }

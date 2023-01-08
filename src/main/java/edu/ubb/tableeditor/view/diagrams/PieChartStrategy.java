@@ -1,6 +1,6 @@
 package edu.ubb.tableeditor.view.diagrams;
 
-import edu.ubb.tableeditor.model.Data;
+import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;

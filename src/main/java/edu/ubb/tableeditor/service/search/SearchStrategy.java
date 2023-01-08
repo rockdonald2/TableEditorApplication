@@ -1,7 +1,7 @@
 package edu.ubb.tableeditor.service.search;
 
-import edu.ubb.tableeditor.model.Data;
-import edu.ubb.tableeditor.model.Position;
+import edu.ubb.tableeditor.model.data.Data;
+import edu.ubb.tableeditor.model.field.Position;
 
 public interface SearchStrategy {
 

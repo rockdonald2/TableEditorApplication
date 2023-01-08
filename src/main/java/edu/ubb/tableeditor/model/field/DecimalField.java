@@ -1,21 +1,21 @@
-package edu.ubb.tableeditor.model;
+package edu.ubb.tableeditor.model.field;
 
 import edu.ubb.tableeditor.service.export.ExportVisitor;
 
-public class TextField extends Field {
+public class DecimalField extends Field {
 
-    private String value;
+    private double value;
 
-    public TextField(String key, String value) {
+    public DecimalField(String key, double value) {
         super(key);
         this.value = value;
     }
 
-    public String getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(int value) {
         this.value = value;
     }
 

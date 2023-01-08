@@ -4,8 +4,8 @@ import edu.ubb.tableeditor.annotation.Flag;
 import edu.ubb.tableeditor.annotation.Singleton;
 import edu.ubb.tableeditor.command.Command;
 import edu.ubb.tableeditor.command.PositionBasedCommand;
-import edu.ubb.tableeditor.model.Data;
-import edu.ubb.tableeditor.model.Position;
+import edu.ubb.tableeditor.model.data.Data;
+import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.sort.DefaultSortStrategy;
@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Singleton
 public final class MainController {
@@ -51,7 +52,7 @@ public final class MainController {
             throw new IllegalStateException(String.format("%s already initialized", MainPanel.class.getName()));
         }
 
-        this.data = Data.get();
+        doCreateBlankData();
         this.mainPanel = MainPanel.instance();
         this.mainPanel.init();
         initialized = true;
@@ -84,7 +85,7 @@ public final class MainController {
 
     public void doExportData() {
         try {
-            Optional<File> optionalSaveFile = mainPanel.showSavePanel();
+            Optional<File> optionalSaveFile = mainPanel.showSavePanelAndGetFile();
 
             if (optionalSaveFile.isEmpty()) return;
 
@@ -168,9 +169,9 @@ public final class MainController {
         final Position position = data.search(search.get().getKey(), search.get().getValue());
 
         if (position != null) {
-            mainPanel.selectCell(position);
+            mainPanel.selectTableCell(position);
         } else {
-            mainPanel.clearSelection();
+            mainPanel.clearTableSelection();
         }
     }
 
@@ -266,6 +267,23 @@ public final class MainController {
 
     public void doCreateBlankData() {
         this.data = Data.get();
+    }
+
+    public void doSetValueRestrictions() {
+        mainPanel.showValueRestrictionsPanel(data);
+    }
+
+    public void addValueRestriction(String header, List<String> valueRestriction) {
+        removeValueRestriction(header);
+        this.data.getValueRestrictions().add(Map.entry(header, valueRestriction));
+        doDisplayData();
+    }
+
+    public void removeValueRestriction(String header) {
+        final Stream<Map.Entry<String, List<String>>> newValueRestrictions = this.data.getValueRestrictions()
+                .stream().filter(restriction -> !restriction.getKey().equals(header));
+
+        this.data.setValueRestrictions(new ArrayList<>(newValueRestrictions.toList()));
         doDisplayData();
     }
 

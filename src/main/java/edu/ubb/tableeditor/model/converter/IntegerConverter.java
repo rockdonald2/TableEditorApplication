@@ -1,7 +1,7 @@
 package edu.ubb.tableeditor.model.converter;
 
-import edu.ubb.tableeditor.model.Field;
-import edu.ubb.tableeditor.model.IntegerField;
+import edu.ubb.tableeditor.model.field.Field;
+import edu.ubb.tableeditor.model.field.IntegerField;
 
 import java.util.Optional;
 

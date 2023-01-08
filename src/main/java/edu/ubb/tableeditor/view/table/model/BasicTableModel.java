@@ -2,12 +2,16 @@ package edu.ubb.tableeditor.view.table.model;
 
 import edu.ubb.tableeditor.command.EditCommand;
 import edu.ubb.tableeditor.controller.MainController;
-import edu.ubb.tableeditor.model.Data;
-import edu.ubb.tableeditor.model.Position;
+import edu.ubb.tableeditor.model.data.Data;
+import edu.ubb.tableeditor.model.field.Position;
 
-public class SimpleTableModel extends CustomTableModel {
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-    public SimpleTableModel(Data data) {
+public class BasicTableModel extends CustomTableModel {
+
+    public BasicTableModel(Data data) {
         super(data);
     }
 
@@ -24,6 +28,16 @@ public class SimpleTableModel extends CustomTableModel {
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return true;
+    }
+
+    @Override
+    public List<Map.Entry<String, List<String>>> getValueRestrictions() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void setValueRestrictions(List<Map.Entry<String, List<String>>> valueRestrictions) {
+        // do nothing
     }
 
 }

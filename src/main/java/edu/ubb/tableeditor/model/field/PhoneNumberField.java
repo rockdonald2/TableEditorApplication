@@ -1,4 +1,4 @@
-package edu.ubb.tableeditor.model;
+package edu.ubb.tableeditor.model.field;
 
 public class PhoneNumberField extends TextField {
 

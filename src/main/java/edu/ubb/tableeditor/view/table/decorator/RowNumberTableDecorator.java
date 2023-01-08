@@ -61,6 +61,7 @@ public class RowNumberTableDecorator extends TableDecorator {
             super.addNotify();
 
             Component c = getParent();
+
             //  Keep scrolling of the row table in sync with the main table.
             if (c instanceof JViewport viewport) {
                 viewport.addChangeListener(this);
