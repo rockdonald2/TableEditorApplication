@@ -154,7 +154,7 @@ public final class MainPanel extends JFrame {
         rowDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Row Numbering", this::toggleRowNumbering, false);
         formulaDecoratorBtn = menuBar.addToggleItemToMenu(othersMenu.getText(), "Toggle Formulas", this::toggleFormulas, false);
 
-        menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("Keyboard shortcuts:\n\nCTRL-F: to search within the table\nCTRL-S: save the table\nCTRL-Z: undo changes\nCTRL-R: redo changes\nCTRL-O: open document"), true);
+        menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("<html><h3>Keyboard shortcuts</h3><p>CTRL-F: to search within the table</p>CTRL-S save the table<p>CTRL-Z: undo changes</p><p>CTRL-R redo changes</p><p>CTRL-O: open document</p></html>"), true);
 
         this.setJMenuBar(menuBar);
     }

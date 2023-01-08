@@ -11,6 +11,8 @@ import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 import edu.ubb.tableeditor.view.table.model.SimpleTableModel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -34,6 +36,7 @@ public class SimpleTable extends JTable implements Table {
 
         addPopup();
         addEditor();
+        addRenderer();
     }
 
     private void addEditor() {
@@ -55,6 +58,14 @@ public class SimpleTable extends JTable implements Table {
         };
 
         this.setDefaultEditor(Object.class, editor);
+    }
+
+    private void addRenderer() {
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setToolTipText("Click for edit");
+        this.setDefaultRenderer(Object.class, renderer);
+        this.setShowHorizontalLines(true);
+        this.setShowVerticalLines(true);
     }
 
     private void addPopup() {
