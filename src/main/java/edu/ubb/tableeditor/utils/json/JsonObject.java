@@ -59,6 +59,10 @@ public class JsonObject {
         for (int i = 0; i < arg.length(); i++) {
             char a = arg.charAt(i);
 
+            if (String.valueOf(a).compareTo(String.valueOf('\n')) == 0) {
+                arg.deleteCharAt(i);
+            }
+
             if (isArray && String.valueOf(a).compareTo(String.valueOf(JsonConstants.COMMA)) == 0) {
                 arg.setCharAt(i, JsonConstants.SPECIAL.toChar());
             }

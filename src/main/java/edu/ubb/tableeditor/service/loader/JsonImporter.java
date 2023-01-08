@@ -52,8 +52,13 @@ public class JsonImporter implements Importer {
             for (int i = 0; i < headers.size(); ++i) {
                 final int finalI = i;
 
-                currData.add(currObj.getRawValue(headers.get(i))
-                        .orElseThrow(() -> new ServiceException("Missing value for " + headers.get(finalI) + " column at object of index " + finalI)));
+                currData.add(
+                        currObj
+                                .getRawValue(headers.get(i))
+                                .orElseThrow(
+                                        () -> new ServiceException("Missing value for " + headers.get(finalI) + " column at object of index " + finalI)
+                                )
+                );
             }
 
             rowData.add(currData);
