@@ -59,4 +59,8 @@ public class MenuBar extends JMenuBar {
         return toggleButton;
     }
 
+    public void addSeparator(String menuName) {
+        menus.get(menuName).add(new JSeparator());
+    }
+
 }

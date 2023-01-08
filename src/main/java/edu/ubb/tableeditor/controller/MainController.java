@@ -28,7 +28,7 @@ public final class MainController {
     private static MainController instance;
 
     private final Deque<Command<?, ?>> commands = new ArrayDeque<>();
-    private final Deque<Command<?, ?>> undoCommands = new ArrayDeque<>();
+    private final Deque<Command<?, ?>> undidCommands = new ArrayDeque<>();
 
     private MainPanel mainPanel;
     private Data data;
@@ -204,34 +204,45 @@ public final class MainController {
         commands.push(command);
         command.execute();
 
-        if (!undoCommands.isEmpty()) {
-            undoCommands.clear();
+        if (!undidCommands.isEmpty()) {
+            undidCommands.clear();
         }
+
+        toggleUndoRedoBtns();
     }
 
     public void undoCommand() {
         try {
             Command<?, ?> undo = commands.pop();
-            undoCommands.push(undo);
+            undidCommands.push(undo);
             undo.unexecute();
         } catch (RuntimeException ignored) {
             // ignored
         }
+
+        toggleUndoRedoBtns();
     }
 
     public void redoCommand() {
         try {
-            Command<?, ?> redo = undoCommands.pop();
+            Command<?, ?> redo = undidCommands.pop();
             commands.push(redo);
             redo.execute();
         } catch (RuntimeException ignored) {
             // ignored
         }
+
+        toggleUndoRedoBtns();
+    }
+
+    private void toggleUndoRedoBtns() {
+        mainPanel.toggleUndoBtn(!commands.isEmpty());
+        mainPanel.toggleRedoBtn(!undidCommands.isEmpty());
     }
 
     public void updateCommands(PositionBasedCommand.Orientation orientation, PositionBasedCommand.Which which, int offset) {
         commands.iterator().forEachRemaining(cmd -> internalUpdateCommand(cmd, orientation, which, offset));
-        undoCommands.iterator().forEachRemaining(cmd -> internalUpdateCommand(cmd, orientation, which, offset));
+        undidCommands.iterator().forEachRemaining(cmd -> internalUpdateCommand(cmd, orientation, which, offset));
     }
 
     private void internalUpdateCommand(Command<?, ?> cmd, PositionBasedCommand.Orientation orientation, PositionBasedCommand.Which which, int offset) {

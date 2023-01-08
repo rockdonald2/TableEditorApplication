@@ -51,6 +51,8 @@ public final class MainPanel extends JFrame {
     private JMenuItem exportItem;
     private JMenuItem openBtn;
     private JMenuItem findBtn;
+    private JMenuItem undoBtn;
+    private JMenuItem redoBtn;
     private Optional<JMenuItem> valueRestrictionsPanelBtn = Optional.empty();
 
     private java.util.List<JCheckBoxMenuItem> decoratorBtns = new ArrayList<>();
@@ -164,6 +166,10 @@ public final class MainPanel extends JFrame {
         openBtn = menuBar.addItemToMenu(mainMenu.getText(), "Open...", this::showImportPanel, true);
         menuBar.addItemToMenu(mainMenu.getText(), "Create...", this::createBlankData, true);
         exportItem = menuBar.addItemToMenu(mainMenu.getText(), "Save As...", e -> mainController.doExportData(), false);
+
+        undoBtn = menuBar.addItemToMenu(fileMenu.getText(), "Undo", e -> mainController.undoCommand(), false);
+        redoBtn = menuBar.addItemToMenu(fileMenu.getText(), "Redo", e -> mainController.redoCommand(), false);
+        menuBar.addSeparator(fileMenu.getText());
         addRowBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Row", this::addNewRow, false);
         addColumnBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Column", this::addNewColumn, false);
         findBtn = menuBar.addItemToMenu(fileMenu.getText(), "Find Cell...", e -> mainController.doSearch(), false);
@@ -198,7 +204,10 @@ public final class MainPanel extends JFrame {
         exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
 
         this.getRootPane().registerKeyboardAction(e -> mainController.undoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        undoBtn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+
         this.getRootPane().registerKeyboardAction(e -> mainController.redoCommand(), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        redoBtn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
 
         this.getRootPane().registerKeyboardAction(e -> findBtn.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
         findBtn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
@@ -328,16 +337,25 @@ public final class MainPanel extends JFrame {
         data.getHeaders().forEach(headers::addItem);
 
         final JPanel restrictionsPanel = new JPanel(new GridLayout(2, 1));
-        restrictionsPanel.add(new JLabel("Specify possible values comma-separated"));
+        restrictionsPanel.add(new JLabel("Specify possible values comma-separated, leave empty for no restrictions"));
         restrictionsPanel.add(headers);
 
         String possibleValues = JOptionPane.showInputDialog(this, restrictionsPanel, "Specify Value Restrictions", JOptionPane.QUESTION_MESSAGE);
 
         if (possibleValues == null || possibleValues.isBlank()) {
+            mainController.removeValueRestriction(Objects.requireNonNull(headers.getSelectedItem()).toString());
             return;
         }
 
         mainController.addValueRestriction(Objects.requireNonNull(headers.getSelectedItem()).toString(), Arrays.stream(possibleValues.split(",")).map(String::trim).toList());
+    }
+
+    public void toggleUndoBtn(boolean flag) {
+        undoBtn.setEnabled(flag);
+    }
+
+    public void toggleRedoBtn(boolean flag) {
+        redoBtn.setEnabled(flag);
     }
 
 }
