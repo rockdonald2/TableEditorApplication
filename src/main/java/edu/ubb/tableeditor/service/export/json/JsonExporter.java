@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class JsonExporter extends Exporter {
 
+    public static final String QUOTE_WRAPPER = "\"%s\"";
+
     @Override
     public ExportVisitor exportVisitor() {
         return new JsonExportVisitor();
@@ -25,7 +27,7 @@ public class JsonExporter extends Exporter {
         exportedData.append(JsonConstants.CURLY_OPEN_BRACKETS);
         exportedData.append("\"headers\"")
                 .append(JsonConstants.COLON)
-                .append(headers.stream().map(header -> String.format("\"%s\"", header)).toList())
+                .append(headers.stream().map(header -> String.format(QUOTE_WRAPPER, header)).toList())
                 .append(JsonConstants.COMMA);
 
         exportedData.append("\"data\"")
@@ -68,9 +70,9 @@ public class JsonExporter extends Exporter {
         final List<Map.Entry<String, List<String>>> valueRestrictions = data.getValueRestrictions();
         AtomicInteger restrictionIdx = new AtomicInteger(0);
         valueRestrictions.forEach(restriction -> {
-            exportedData.append(String.format("\"%s\"", restriction.getKey()))
+            exportedData.append(String.format(QUOTE_WRAPPER, restriction.getKey()))
                     .append(JsonConstants.COLON)
-                    .append(restriction.getValue().stream().map(value -> String.format("\"%s\"", value)).toList());
+                    .append(restriction.getValue().stream().map(value -> String.format(QUOTE_WRAPPER, value)).toList());
 
             if (restrictionIdx.get() < (valueRestrictions.size() - 1)) {
                 exportedData.append(JsonConstants.COMMA);
