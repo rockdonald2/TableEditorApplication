@@ -1,5 +1,6 @@
 package edu.ubb.tableeditor.view.table.decorator;
 
+import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.view.table.Table;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
@@ -29,8 +30,8 @@ public abstract class TableDecorator implements Table {
     }
 
     @Override
-    public CustomTableModel constructModel(String[][] data, String[] headers) {
-        return table.constructModel(data, headers);
+    public CustomTableModel constructModel(Data data) {
+        return table.constructModel(data);
     }
 
     public abstract void reset();

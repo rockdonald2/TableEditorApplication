@@ -1,5 +1,6 @@
 package edu.ubb.tableeditor.view.table;
 
+import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
 import javax.swing.*;
@@ -12,6 +13,6 @@ public interface Table {
 
     void displayData(CustomTableModel tableModel);
 
-    CustomTableModel constructModel(String[][] data, String[] headers);
+    CustomTableModel constructModel(Data data);
 
 }

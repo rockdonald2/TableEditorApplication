@@ -33,10 +33,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 @Singleton
 public final class MainPanel extends JFrame {
@@ -191,14 +189,7 @@ public final class MainPanel extends JFrame {
     }
 
     public void displayData(Data data) {
-        List<String> headers = data.getHeaders();
-        List<List<String>> rowData = data.getData();
-
-        String[][] tableData = new String[rowData.size()][headers.size()];
-        IntStream.range(0, rowData.size())
-                .forEach(idx -> tableData[idx] = rowData.get(idx).toArray(new String[]{}));
-
-        table.displayData(table.constructModel(tableData, headers.toArray(new String[]{})));
+        table.displayData(table.constructModel(data));
 
         addRowBtn.setEnabled(true);
         addColumnBtn.setEnabled(true);

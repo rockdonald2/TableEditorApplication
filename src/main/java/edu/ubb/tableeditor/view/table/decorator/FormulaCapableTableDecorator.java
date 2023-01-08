@@ -1,5 +1,6 @@
 package edu.ubb.tableeditor.view.table.decorator;
 
+import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.view.table.Table;
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 import edu.ubb.tableeditor.view.table.model.decorator.FormulaCapableTableModel;
@@ -17,8 +18,8 @@ public class FormulaCapableTableDecorator extends TableDecorator {
     }
 
     @Override
-    public CustomTableModel constructModel(String[][] data, String[] headers) {
-        return new FormulaCapableTableModel(super.constructModel(data, headers));
+    public CustomTableModel constructModel(Data data) {
+        return new FormulaCapableTableModel(super.constructModel(data));
     }
 
 }

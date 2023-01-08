@@ -3,6 +3,7 @@ package edu.ubb.tableeditor.view.table;
 import edu.ubb.tableeditor.command.RemoveColumnCommand;
 import edu.ubb.tableeditor.command.RemoveRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
+import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.model.Position;
 import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.view.diagrams.BarChartStrategy;
@@ -28,7 +29,7 @@ public class SimpleTable extends JTable implements Table {
         int windowWidth = PropertiesContext.getIntProperty("window.size.width");
         int windowHeight = PropertiesContext.getIntProperty("window.size.height");
 
-        this.setModel(this.constructModel(new String[][]{}, new String[]{" "}));
+        this.setModel(this.constructModel(Data.get()));
         this.getTableHeader().setReorderingAllowed(false);
 
         this.container = new JScrollPane(getTable());
@@ -176,8 +177,8 @@ public class SimpleTable extends JTable implements Table {
     }
 
     @Override
-    public CustomTableModel constructModel(String[][] data, String[] headers) {
-        return new SimpleTableModel(data, headers);
+    public CustomTableModel constructModel(Data data) {
+        return new SimpleTableModel(data);
     }
 
 }

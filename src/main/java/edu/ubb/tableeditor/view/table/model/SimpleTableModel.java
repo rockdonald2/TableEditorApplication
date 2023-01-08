@@ -2,12 +2,13 @@ package edu.ubb.tableeditor.view.table.model;
 
 import edu.ubb.tableeditor.command.EditCommand;
 import edu.ubb.tableeditor.controller.MainController;
+import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.model.Position;
 
 public class SimpleTableModel extends CustomTableModel {
 
-    public SimpleTableModel(String[][] data, String[] headers) {
-        super(data, headers);
+    public SimpleTableModel(Data data) {
+        super(data);
     }
 
     @Override
