@@ -109,12 +109,7 @@ public final class MainPanel extends JFrame {
             MainPanel.this.table = new RowNumberTableDecorator(MainPanel.this.table);
             MainPanel.this.mainController.doDisplayData();
         } else {
-            if (MainPanel.this.table instanceof final TableDecorator decorator) {
-                decorator.reset();
-            }
-
-            MainPanel.this.table = (Table) MainPanel.this.table.getTable();
-            MainPanel.this.mainController.doDisplayData();
+            resetDecorator();
         }
     }
 
@@ -123,13 +118,17 @@ public final class MainPanel extends JFrame {
             MainPanel.this.table = new FormulaCapableTableDecorator(MainPanel.this.table);
             MainPanel.this.mainController.doDisplayData();
         } else {
-            if (MainPanel.this.table instanceof final TableDecorator decorator) {
-                decorator.reset();
-            }
-
-            MainPanel.this.table = (Table) MainPanel.this.table.getTable();
-            MainPanel.this.mainController.doDisplayData();
+            resetDecorator();
         }
+    }
+
+    private void resetDecorator() {
+        if (MainPanel.this.table instanceof final TableDecorator decorator) {
+            decorator.reset();
+        }
+
+        MainPanel.this.table = (Table) MainPanel.this.table.getTable();
+        MainPanel.this.mainController.doDisplayData();
     }
 
     private void createTable() {
