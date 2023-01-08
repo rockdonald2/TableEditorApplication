@@ -63,7 +63,7 @@ public class SimpleTable extends JTable implements Table {
 
     private void addRenderer() {
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-        renderer.setToolTipText("Click for edit");
+        renderer.setToolTipText("Click to edit");
         this.setDefaultRenderer(Object.class, renderer);
         this.setShowHorizontalLines(true);
         this.setShowVerticalLines(true);
