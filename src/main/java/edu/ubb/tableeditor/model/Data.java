@@ -3,10 +3,21 @@ package edu.ubb.tableeditor.model;
 import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.sort.ComparatorStrategy;
 import edu.ubb.tableeditor.service.sort.SortStrategy;
+import edu.ubb.tableeditor.utils.PropertiesContext;
 
 import java.util.List;
 
 public interface Data {
+
+    static Data get() {
+        final String dataFormat = PropertiesContext.getStringProperty("data.format");
+
+        if ("basic".equalsIgnoreCase(dataFormat)) {
+            return new BasicData();
+        }
+
+        throw new IllegalStateException("No date format specified in properties");
+    }
 
     List<String> getHeaders();
 

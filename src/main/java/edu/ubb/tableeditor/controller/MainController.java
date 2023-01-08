@@ -4,24 +4,19 @@ import edu.ubb.tableeditor.annotation.Flag;
 import edu.ubb.tableeditor.annotation.Singleton;
 import edu.ubb.tableeditor.command.Command;
 import edu.ubb.tableeditor.command.PositionBasedCommand;
-import edu.ubb.tableeditor.model.BaseData;
 import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.model.Position;
 import edu.ubb.tableeditor.service.exception.ServiceException;
-import edu.ubb.tableeditor.service.export.Exporter;
-import edu.ubb.tableeditor.service.export.json.JsonExporter;
-import edu.ubb.tableeditor.service.loader.CsvImporter;
-import edu.ubb.tableeditor.service.loader.Importer;
-import edu.ubb.tableeditor.service.loader.JSONImporter;
 import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.sort.DefaultSortStrategy;
-import edu.ubb.tableeditor.utils.Util;
+import edu.ubb.tableeditor.utils.input.IOFile;
 import edu.ubb.tableeditor.view.MainPanel;
 import edu.ubb.tableeditor.view.diagrams.DiagramStrategy;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -56,7 +51,7 @@ public final class MainController {
             throw new IllegalStateException(String.format("%s already initialized", MainPanel.class.getName()));
         }
 
-        this.data = new BaseData();
+        this.data = Data.get();
         this.mainPanel = MainPanel.instance();
         this.mainPanel.init();
         initialized = true;
@@ -70,35 +65,17 @@ public final class MainController {
         return data.getData().size();
     }
 
-    public void doImportData(String filePath) {
+    public void doImportData(File file) {
         try {
-            this.data = importData(filePath);
+            IOFile ioFile = IOFile.getFileAsIOFile(file.toPath());
+
+            this.data = ioFile.getImporter().importData(ioFile);
+
             doDisplayData();
             mainPanel.showInfo("Successfully imported data");
         } catch (ServiceException e) {
             mainPanel.showError(e.getMessage());
         }
-    }
-
-    private Data importData(String filePath) throws ServiceException {
-        final Optional<String> extension = Util.getExtensionByStringHandling(filePath);
-
-        if (extension.isEmpty()) {
-            throw new ServiceException("Failed to deduce extension from file name while importing data");
-        }
-
-        Importer importer = null;
-        if ("csv".equals(extension.get())) {
-            importer = new CsvImporter();
-        } else if ("json".equals(extension.get())) {
-            importer = new JSONImporter();
-        }
-
-        if (importer == null) {
-            throw new ServiceException("Failed to obtain importer");
-        }
-
-        return importer.importData(filePath);
     }
 
     public void doDisplayData() {
@@ -111,40 +88,18 @@ public final class MainController {
 
             if (optionalSaveFile.isEmpty()) return;
 
-            final File saveFile = optionalSaveFile.get();
-
-            final Optional<String> extension = Util.getExtensionByStringHandling(saveFile.getName());
-
-            if (extension.isEmpty()) {
-                mainPanel.showError(String.format("Failed to find extension of file %s", saveFile.getName()));
-                return;
-            }
-
-            final String dataStr = exportData(extension.get());
+            final Path saveFile = optionalSaveFile.get().toPath();
+            final String dataStr = IOFile.getFileAsIOFile(saveFile).getExporter().exportData(data);
 
             try { // NOSONAR; intentionally
-                Files.writeString(saveFile.toPath(), dataStr);
+                Files.writeString(saveFile, dataStr);
                 mainPanel.showInfo("Successfully exported data");
             } catch (IOException e) {
                 throw new ServiceException("Failed to save data", e);
             }
-        } catch (ServiceException e) {
+        } catch (ServiceException | IllegalArgumentException e) {
             mainPanel.showError(e.getMessage());
         }
-    }
-
-    private String exportData(String extension) throws ServiceException {
-        Exporter exporter = null;
-
-        if ("json".equals(extension)) {
-            exporter = new JsonExporter();
-        }
-
-        if (exporter == null) {
-            throw new ServiceException("Failed to export data because no suitable exporter has been found");
-        }
-
-        return exporter.exportData(data);
     }
 
     public void doModifyValueAt(int row, int column, String value) {
@@ -310,7 +265,7 @@ public final class MainController {
     }
 
     public void doCreateBlankData() {
-        this.data = new BaseData();
+        this.data = Data.get();
         doDisplayData();
     }
 

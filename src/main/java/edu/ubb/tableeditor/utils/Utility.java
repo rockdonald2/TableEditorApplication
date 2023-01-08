@@ -5,9 +5,9 @@ import edu.ubb.tableeditor.annotation.Singleton;
 import java.util.Optional;
 
 @Singleton
-public final class Util {
+public final class Utility {
 
-    private Util() {
+    private Utility() {
     }
 
     public static Optional<String> getExtensionByStringHandling(String filename) {

@@ -2,7 +2,6 @@ package edu.ubb.tableeditor.view.table.model.decorator;
 
 import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
-import javax.swing.event.TableModelListener;
 import java.util.Vector;
 
 public abstract class TableModelDecorator extends CustomTableModel {

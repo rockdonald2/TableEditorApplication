@@ -1,4 +1,4 @@
-package edu.ubb.tableeditor.service.converter;
+package edu.ubb.tableeditor.model.converter;
 
 import edu.ubb.tableeditor.model.Field;
 import edu.ubb.tableeditor.model.TextField;

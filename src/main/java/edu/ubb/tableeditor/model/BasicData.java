@@ -3,12 +3,12 @@ package edu.ubb.tableeditor.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseData implements Data {
+public class BasicData implements Data {
 
     private List<String> headers;
     private List<List<String>> data;
 
-    public BaseData() {
+    public BasicData() {
         this.headers = new ArrayList<>();
         this.data = new ArrayList<>();
     }

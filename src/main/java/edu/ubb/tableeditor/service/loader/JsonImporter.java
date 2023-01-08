@@ -1,12 +1,12 @@
 package edu.ubb.tableeditor.service.loader;
 
-import edu.ubb.tableeditor.model.BaseData;
 import edu.ubb.tableeditor.model.Data;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.iterator.Iterator;
-import edu.ubb.tableeditor.service.iterator.JSONArrayIterator;
-import edu.ubb.tableeditor.utils.json.JSONArray;
-import edu.ubb.tableeditor.utils.json.JSONObject;
+import edu.ubb.tableeditor.service.iterator.JsonArrayIterator;
+import edu.ubb.tableeditor.utils.input.IOFile;
+import edu.ubb.tableeditor.utils.json.JsonArray;
+import edu.ubb.tableeditor.utils.json.JsonObject;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,26 +15,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class JSONImporter implements Importer {
+public class JsonImporter implements Importer {
 
     @Override
-    public Data importData(String fileName) throws ServiceException {
-        final BaseData data = new BaseData();
-        final Path file = Path.of(fileName);
+    public Data importData(IOFile ioFile) throws ServiceException {
+        final Data data = Data.get();
+        final Path file = ioFile.getPath();
 
         if (Files.notExists(file)) {
             throw new ServiceException("Given file for import does not exists");
         }
 
-        JSONObject object;
+        JsonObject object;
         try {
-            object = new JSONObject(Files.readString(file));
+            object = new JsonObject(Files.readString(file));
         } catch (IOException e) {
             throw new ServiceException("Given file for import does not exists", e);
         }
 
-        JSONArray jsonHeaders = object.getJSONArray("headers").orElseThrow(() -> new ServiceException("Missing headers field from input JSON"));
-        JSONArray jsonData = object.getJSONArray("data").orElseThrow(() -> new ServiceException("Missing data field from input JSON"));
+        JsonArray jsonHeaders = object.getJsonArray("headers").orElseThrow(() -> new ServiceException("Missing headers field from input JSON"));
+        JsonArray jsonData = object.getJsonArray("data").orElseThrow(() -> new ServiceException("Missing data field from input JSON"));
 
         List<String> headers = new ArrayList<>();
         List<List<String>> rowData = new ArrayList<>();
@@ -43,15 +43,17 @@ public class JSONImporter implements Importer {
             headers.add(jsonHeaders.getRawValue(idx).get());
         });
 
-        Iterator<JSONObject> iterator = new JSONArrayIterator(jsonData);
+        Iterator<JsonObject> iterator = new JsonArrayIterator(jsonData);
 
         while (iterator.hasNext()) {
-            JSONObject currObj = iterator.next();
+            JsonObject currObj = iterator.next();
             List<String> currData = new ArrayList<>();
 
             for (int i = 0; i < headers.size(); ++i) {
                 final int finalI = i;
-                currData.add(currObj.getRawValue(headers.get(i)).orElseThrow(() -> new ServiceException("Missing value for " + headers.get(finalI) + " column at index " + finalI)));
+
+                currData.add(currObj.getRawValue(headers.get(i))
+                        .orElseThrow(() -> new ServiceException("Missing value for " + headers.get(finalI) + " column at object of index " + finalI)));
             }
 
             rowData.add(currData);

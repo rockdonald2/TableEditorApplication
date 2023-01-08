@@ -1,11 +1,11 @@
-package edu.ubb.tableeditor.service.converter;
+package edu.ubb.tableeditor.model.converter;
 
-import edu.ubb.tableeditor.model.DecimalField;
 import edu.ubb.tableeditor.model.Field;
+import edu.ubb.tableeditor.model.PhoneNumberField;
 
 import java.util.Optional;
 
-public class DecimalConverter extends Converter {
+public class PhoneNumberConverter extends Converter {
 
     @Override
     public Optional<Field> convert(String key, String value) {
@@ -19,11 +19,11 @@ public class DecimalConverter extends Converter {
     }
 
     private Optional<Field> tryParseField(String key, String value) {
-        try {
-            return Optional.of(new DecimalField(key, Double.parseDouble(value)));
-        } catch (NumberFormatException | NullPointerException e) {
+        if (!value.matches("\\+\\d{4,}")) {
             return Optional.empty();
         }
+
+        return Optional.of(new PhoneNumberField(key, value));
     }
 
 }

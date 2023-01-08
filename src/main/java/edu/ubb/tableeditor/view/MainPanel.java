@@ -15,6 +15,7 @@ import edu.ubb.tableeditor.service.search.SearchStrategy;
 import edu.ubb.tableeditor.service.search.SubStringSearchStrategy;
 import edu.ubb.tableeditor.service.search.WholeCellSearchStrategy;
 import edu.ubb.tableeditor.utils.PropertiesContext;
+import edu.ubb.tableeditor.utils.input.IOFile;
 import edu.ubb.tableeditor.view.button.SearchRadioButton;
 import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
@@ -27,7 +28,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -145,7 +145,7 @@ public final class MainPanel extends JFrame {
         final JMenu othersMenu = menuBar.addMenu("Others", KeyEvent.VK_O);
         final JMenu helpMenu = menuBar.addMenu("Help", KeyEvent.VK_H);
 
-        openBtn = menuBar.addItemToMenu(mainMenu.getText(), "Open...", this::importData, true);
+        openBtn = menuBar.addItemToMenu(mainMenu.getText(), "Open...", this::showImportPanel, true);
         menuBar.addItemToMenu(mainMenu.getText(), "Create...", this::createBlankData, true);
         exportItem = menuBar.addItemToMenu(mainMenu.getText(), "Save As...", e -> mainController.doExportData(), false);
         addRowBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Row", this::addNewRow, false);
@@ -209,14 +209,13 @@ public final class MainPanel extends JFrame {
         findBtn.setEnabled(true);
     }
 
-    private void importData(ActionEvent e) {
+    private void showImportPanel(ActionEvent e) {
         final JFileChooser chooser = new JFileChooser();
         chooser.setAcceptAllFileFilterUsed(false);
-
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter("CSV (*.csv)", "csv"));
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter("JSON (*.json)", "json"));
-
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+        IOFile.getInputExtensions().forEach(chooser::addChoosableFileFilter);
+
         int hasOpened = chooser.showOpenDialog(MainPanel.this);
 
         if (hasOpened != JFileChooser.APPROVE_OPTION) {
@@ -224,7 +223,7 @@ public final class MainPanel extends JFrame {
         }
 
         final File selectedFile = chooser.getSelectedFile();
-        mainController.doImportData(selectedFile.getAbsolutePath());
+        mainController.doImportData(selectedFile);
     }
 
     private void createBlankData(ActionEvent e) {
@@ -234,7 +233,10 @@ public final class MainPanel extends JFrame {
     public Optional<File> showSavePanel() {
         final JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        chooser.setFileFilter(new FileNameExtensionFilter("JSON (*.json)", "json"));
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        IOFile.getOutputExtensions().forEach(chooser::addChoosableFileFilter);
+
         int hasOpened = chooser.showSaveDialog(this);
 
         if (hasOpened != JFileChooser.APPROVE_OPTION) {

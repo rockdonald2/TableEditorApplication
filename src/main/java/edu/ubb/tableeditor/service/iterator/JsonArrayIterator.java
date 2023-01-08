@@ -1,8 +1,8 @@
 package edu.ubb.tableeditor.service.iterator;
 
 import edu.ubb.tableeditor.service.exception.ServiceException;
-import edu.ubb.tableeditor.utils.json.JSONArray;
-import edu.ubb.tableeditor.utils.json.JSONObject;
+import edu.ubb.tableeditor.utils.json.JsonArray;
+import edu.ubb.tableeditor.utils.json.JsonObject;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,21 +10,21 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-public class JSONArrayIterator implements Iterator<JSONObject> {
+public class JsonArrayIterator implements Iterator<JsonObject> {
 
-    private final JSONArray array;
+    private final JsonArray array;
     private int currIdx = 0;
 
 
-    public JSONArrayIterator(Path inputFile) throws IOException, IllegalArgumentException {
+    public JsonArrayIterator(Path inputFile) throws IOException, IllegalArgumentException {
         Objects.requireNonNull(inputFile);
 
         final String content = Files.readString(inputFile);
 
-        array = new JSONArray(content);
+        array = new JsonArray(content);
     }
 
-    public JSONArrayIterator(JSONArray array) {
+    public JsonArrayIterator(JsonArray array) {
         this.array = array;
     }
 
@@ -34,15 +34,15 @@ public class JSONArrayIterator implements Iterator<JSONObject> {
     }
 
     @Override
-    public JSONObject next() throws ServiceException {
-        JSONObject parsed;
+    public JsonObject next() throws ServiceException {
+        JsonObject parsed;
 
-        Optional<JSONArray> nextArr;
-        Optional<JSONObject> nextObj;
+        Optional<JsonArray> nextArr;
+        Optional<JsonObject> nextObj;
 
-        nextArr = array.getJSONArray(currIdx);
+        nextArr = array.getJsonArray(currIdx);
         if (nextArr.isEmpty()) {
-            nextObj = array.getJSONObject(currIdx);
+            nextObj = array.getJsonObject(currIdx);
             parsed = nextObj.orElseThrow(() -> new ServiceException("JSONArrayIterator only support iterating over JSONObject/JSONArray"));
         } else {
             parsed = nextArr.get();

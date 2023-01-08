@@ -1,6 +1,6 @@
 package edu.ubb.tableeditor.utils.json;
 
-public enum JSONConstants {
+public enum JsonConstants {
 
     CURLY_OPEN_BRACKETS('{'),
     CURLY_CLOSE_BRACKETS('}'),
@@ -8,21 +8,23 @@ public enum JSONConstants {
     SQUARE_CLOSE_BRACKETS(']'),
     COLON(':'),
     COMMA(','),
-    SPECIAL('|');
+    SPECIAL('|'),
+    SINGLE_QUOTE('\''),
+    DOUBLE_QUOTE('"');
 
     private final char constant;
 
-    JSONConstants(char constant) {
+    JsonConstants(char constant) {
         this.constant = constant;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(constant);
+        return String.valueOf(this.constant);
     }
 
     public char toChar() {
-        return String.valueOf(this).toCharArray()[0];
+        return this.constant;
     }
 
 }

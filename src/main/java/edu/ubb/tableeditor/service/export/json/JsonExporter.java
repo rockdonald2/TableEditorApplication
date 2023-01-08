@@ -6,7 +6,6 @@ import edu.ubb.tableeditor.service.export.Exporter;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 public class JsonExporter extends Exporter {
 
