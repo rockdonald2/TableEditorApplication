@@ -1,9 +1,10 @@
-package edu.ubb.tableeditor.service.loader;
+package edu.ubb.tableeditor.service.loader.csv;
 
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.iterator.CsvIterator;
 import edu.ubb.tableeditor.service.iterator.Iterator;
+import edu.ubb.tableeditor.service.loader.Importer;
 import edu.ubb.tableeditor.utils.input.IOFile;
 
 import java.io.IOException;

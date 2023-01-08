@@ -42,31 +42,6 @@ public class JsonArray extends JsonObject {
     }
 
     @Override
-    protected void innerReplaces(StringBuilder arg) {
-        boolean isObject = false;
-
-        for (int i = 0; i < arg.length(); i++) {
-            char a = arg.charAt(i);
-
-            if (String.valueOf(a).compareTo(String.valueOf('\n')) == 0) {
-                arg.deleteCharAt(i);
-            }
-
-            if (isObject && String.valueOf(a).compareTo(String.valueOf(JsonConstants.COMMA)) == 0) {
-                arg.setCharAt(i, JsonConstants.SPECIAL.toChar());
-            }
-
-            if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.CURLY_OPEN_BRACKETS)) == 0) {
-                isObject = true;
-            }
-
-            if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.CURLY_CLOSE_BRACKETS)) == 0) {
-                isObject = false;
-            }
-        }
-    }
-
-    @Override
     public List<String> getKeys() {
         throw new UnsupportedOperationException();
     }

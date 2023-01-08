@@ -9,7 +9,7 @@ public class JsonObject {
 
     private HashMap<String, String> objects;
 
-    public JsonObject() {
+    protected JsonObject() {
     }
 
     public JsonObject(String arg) {
@@ -54,25 +54,32 @@ public class JsonObject {
     }
 
     protected void innerReplaces(StringBuilder arg) {
-        boolean isArray = false;
+        int currObjectIdx = 0;
+        int currArrayIdx = 0;
 
         for (int i = 0; i < arg.length(); i++) {
             char a = arg.charAt(i);
+
+            boolean isComma = String.valueOf(a).compareTo(String.valueOf(JsonConstants.COMMA)) == 0;
 
             if (String.valueOf(a).compareTo(String.valueOf('\n')) == 0) {
                 arg.deleteCharAt(i);
             }
 
-            if (isArray && String.valueOf(a).compareTo(String.valueOf(JsonConstants.COMMA)) == 0) {
+            if ((currArrayIdx > 0 || currObjectIdx > 0) && isComma) {
                 arg.setCharAt(i, JsonConstants.SPECIAL.toChar());
             }
 
             if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.SQUARE_OPEN_BRACKETS)) == 0) {
-                isArray = true;
+                currArrayIdx++;
+            } else if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.SQUARE_CLOSE_BRACKETS)) == 0) {
+                currArrayIdx--;
             }
 
-            if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.SQUARE_CLOSE_BRACKETS)) == 0) {
-                isArray = false;
+            if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.CURLY_OPEN_BRACKETS)) == 0) {
+                currObjectIdx++;
+            } else if (String.valueOf(a).compareTo(String.valueOf(JsonConstants.CURLY_CLOSE_BRACKETS)) == 0) {
+                currObjectIdx--;
             }
         }
     }

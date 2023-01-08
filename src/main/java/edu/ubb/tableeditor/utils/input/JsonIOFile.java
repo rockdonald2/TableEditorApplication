@@ -3,7 +3,7 @@ package edu.ubb.tableeditor.utils.input;
 import edu.ubb.tableeditor.service.export.Exporter;
 import edu.ubb.tableeditor.service.export.json.JsonExporter;
 import edu.ubb.tableeditor.service.loader.Importer;
-import edu.ubb.tableeditor.service.loader.JsonImporter;
+import edu.ubb.tableeditor.service.loader.json.JsonImporter;
 
 import java.nio.file.Path;
 

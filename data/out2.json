@@ -3,26 +3,41 @@
     "clientName",
     "clientEmail",
     "clientTel",
-    "clientAge"
+    "clientAge",
+    "Test"
   ],
   "data": [
     {
       "clientName": "Lukacs Zsolt",
       "clientEmail": "lukacs.zsolt@email.com",
       "clientTel": "+40074323213",
-      "clientAge": 22
+      "clientAge": 22,
+      "Test": 2
     },
     {
       "clientName": "Lukacs Csaba",
       "clientEmail": "lukacs.csaba@email.com",
       "clientTel": "+40074323213",
-      "clientAge": 29
+      "clientAge": 29,
+      "Test": 1
+    },
+    {
+      "clientName": "",
+      "clientEmail": "",
+      "clientTel": "",
+      "clientAge": "",
+      "Test": 3
     }
   ],
   "valueRestrictions": {
     "clientName": [
       "Zsolt",
       "Csaba"
+    ],
+    "Test": [
+      "1",
+      "2",
+      "3"
     ]
   }
 }

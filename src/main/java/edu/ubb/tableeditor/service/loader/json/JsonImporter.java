@@ -1,9 +1,10 @@
-package edu.ubb.tableeditor.service.loader;
+package edu.ubb.tableeditor.service.loader.json;
 
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.service.exception.ServiceException;
 import edu.ubb.tableeditor.service.iterator.Iterator;
 import edu.ubb.tableeditor.service.iterator.JsonArrayIterator;
+import edu.ubb.tableeditor.service.loader.Importer;
 import edu.ubb.tableeditor.utils.input.IOFile;
 import edu.ubb.tableeditor.utils.json.JsonArray;
 import edu.ubb.tableeditor.utils.json.JsonObject;

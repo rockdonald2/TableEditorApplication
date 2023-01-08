@@ -1,7 +1,7 @@
 package edu.ubb.tableeditor.utils.input;
 
 import edu.ubb.tableeditor.service.export.Exporter;
-import edu.ubb.tableeditor.service.loader.CsvImporter;
+import edu.ubb.tableeditor.service.loader.csv.CsvImporter;
 import edu.ubb.tableeditor.service.loader.Importer;
 
 import java.nio.file.Path;
