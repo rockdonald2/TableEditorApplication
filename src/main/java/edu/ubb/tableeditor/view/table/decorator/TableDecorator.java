@@ -24,6 +24,10 @@ public abstract class TableDecorator implements Table {
         return table.getTable();
     }
 
+    public Table getDecorated() {
+        return table;
+    }
+
     @Override
     public void displayData(CustomTableModel tableModel) {
         table.displayData(tableModel);
@@ -34,6 +38,8 @@ public abstract class TableDecorator implements Table {
         return table.defineModel(data);
     }
 
-    public abstract void reset();
+    public void reset() {
+        // do nothing
+    }
 
 }

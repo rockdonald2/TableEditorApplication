@@ -8,8 +8,8 @@ import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.view.diagrams.BarChartStrategy;
 import edu.ubb.tableeditor.view.diagrams.PieChartStrategy;
-import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 import edu.ubb.tableeditor.view.table.model.BasicTableModel;
+import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;

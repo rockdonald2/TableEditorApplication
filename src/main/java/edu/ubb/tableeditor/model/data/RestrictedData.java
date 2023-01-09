@@ -7,7 +7,7 @@ import java.util.Map;
 public class RestrictedData extends BasicData {
 
     private List<Map.Entry<String, List<String>>> valueRestrictions;
-    
+
     public RestrictedData() {
         super();
         this.valueRestrictions = new ArrayList<>();

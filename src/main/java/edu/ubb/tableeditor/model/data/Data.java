@@ -57,7 +57,7 @@ public interface Data {
 
     enum DataFormat {
         BASIC,
-        VALUERESTRICTED;
+        VALUERESTRICTED
     }
 
 }

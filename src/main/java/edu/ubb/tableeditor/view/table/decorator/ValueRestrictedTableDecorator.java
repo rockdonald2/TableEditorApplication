@@ -15,11 +15,6 @@ public class ValueRestrictedTableDecorator extends TableDecorator {
     }
 
     @Override
-    public void reset() {
-        // do nothing, as it is feature flag
-    }
-
-    @Override
     public void displayData(CustomTableModel tableModel) {
         super.displayData(tableModel);
 

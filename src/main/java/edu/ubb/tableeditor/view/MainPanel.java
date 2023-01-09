@@ -21,9 +21,7 @@ import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
 import edu.ubb.tableeditor.view.table.JTableImpl;
 import edu.ubb.tableeditor.view.table.Table;
-import edu.ubb.tableeditor.view.table.decorator.FormulaCapableTableDecorator;
-import edu.ubb.tableeditor.view.table.decorator.RowNumberTableDecorator;
-import edu.ubb.tableeditor.view.table.decorator.ValueRestrictedTableDecorator;
+import edu.ubb.tableeditor.view.table.decorator.*;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
@@ -33,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.List;
 import java.util.*;
 
 @Singleton
@@ -55,7 +54,7 @@ public final class MainPanel extends JFrame {
     private JMenuItem redoBtn;
     private Optional<JMenuItem> valueRestrictionsPanelBtn = Optional.empty();
 
-    private java.util.List<JCheckBoxMenuItem> decoratorBtns = new ArrayList<>();
+    private final java.util.List<JCheckBoxMenuItem> decoratorBtns = new ArrayList<>();
 
     @Flag
     private boolean initialized;
@@ -87,7 +86,9 @@ public final class MainPanel extends JFrame {
         }
 
         this.setJMenuBar(createMenuBar());
-        this.add(createTable().getContainer());
+
+        this.table = new StyleCapableTableDecorator(createTable());
+        this.add(this.table.getContainer());
         baseConfig();
         initialized = true;
     }
@@ -107,26 +108,22 @@ public final class MainPanel extends JFrame {
         mainController.executeCommand(new AddColumnCommand(mainController, new Position(0, mainController.getColumns()), columnName));
     }
 
-    private void toggleRowNumbering(ActionEvent e) {
-        if (((AbstractButton) e.getSource()).isSelected()) {
-            this.table = new RowNumberTableDecorator(this.table);
-            this.mainController.doDisplayData();
-        } else {
-            resetDecorator();
-        }
-    }
-
-    private void toggleFormulas(ActionEvent e) {
-        if (((AbstractButton) e.getSource()).isSelected()) {
-            this.table = new FormulaCapableTableDecorator(this.table);
-            this.mainController.doDisplayData();
-        } else {
-            resetDecorator();
-        }
-    }
-
-    private void resetDecorator() {
+    private void resetDecorators() {
         this.remove(this.table.getContainer());
+
+        Map<Position, List<StyleCapableTableDecorator.Style>> appliedStyles = new HashMap<>();
+
+        Table currLayer = this.table;
+        if (currLayer instanceof TableDecorator) {
+            while (currLayer instanceof TableDecorator) {
+                if (currLayer instanceof final StyleCapableTableDecorator decorator) {
+                    appliedStyles = decorator.getStyles();
+                }
+
+                currLayer = ((TableDecorator) currLayer).getDecorated();
+            }
+        }
+
         this.table = createTable();
 
         decoratorBtns.forEach(btn -> {
@@ -139,6 +136,9 @@ public final class MainPanel extends JFrame {
         });
 
         this.mainController.doDisplayData();
+
+        this.table = new StyleCapableTableDecorator(this.table);
+        ((StyleCapableTableDecorator) this.table).setStyles(appliedStyles);
         this.add(this.table.getContainer());
 
         this.repaint();
@@ -146,10 +146,10 @@ public final class MainPanel extends JFrame {
     }
 
     private Table createTable() {
+        this.table = new JTableImpl();
+
         if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED)) {
             this.table = new ValueRestrictedTableDecorator(new JTableImpl());
-        } else if (Data.getFormat().equals(Data.DataFormat.BASIC)) {
-            this.table = new JTableImpl();
         }
 
         return this.table;
@@ -174,8 +174,14 @@ public final class MainPanel extends JFrame {
         addColumnBtn = menuBar.addItemToMenu(fileMenu.getText(), "Add Column", this::addNewColumn, false);
         findBtn = menuBar.addItemToMenu(fileMenu.getText(), "Find Cell...", e -> mainController.doSearch(), false);
 
-        decoratorBtns.add(menuBar.addToggleItemToMenu(othersMenu.getText(), TOGGLE_ROW_NUMBERING, this::toggleRowNumbering, false));
-        decoratorBtns.add(menuBar.addToggleItemToMenu(othersMenu.getText(), TOGGLE_FORMULAS, this::toggleFormulas, false));
+        decoratorBtns.add(menuBar.addToggleItemToMenu(othersMenu.getText(), TOGGLE_ROW_NUMBERING, e -> {
+            resetDecorators();
+            this.mainController.doDisplayData();
+        }, false));
+        decoratorBtns.add(menuBar.addToggleItemToMenu(othersMenu.getText(), TOGGLE_FORMULAS, e -> {
+            resetDecorators();
+            this.mainController.doDisplayData();
+        }, false));
 
         menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("<html><h3>Keyboard shortcuts</h3><p>CTRL-F: to search within the table</p>CTRL-S save the table<p>CTRL-Z: undo changes</p><p>CTRL-R redo changes</p><p>CTRL-O: open document</p></html>"), true);
 
@@ -248,12 +254,22 @@ public final class MainPanel extends JFrame {
         }
 
         final File selectedFile = chooser.getSelectedFile();
+
+        resetTable();
         mainController.doImportData(selectedFile);
     }
 
     private void createBlankData(ActionEvent e) {
+        resetTable();
+
         mainController.doCreateBlankData();
         mainController.doDisplayData();
+    }
+
+    private void resetTable() {
+        this.remove(this.table.getContainer());
+        this.table = createTable();
+        resetDecorators();
     }
 
     public Optional<File> showSavePanelAndGetFile() {

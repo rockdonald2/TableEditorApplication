@@ -13,11 +13,6 @@ public class FormulaCapableTableDecorator extends TableDecorator {
     }
 
     @Override
-    public void reset() {
-        // do nothing as there is nothing to reset
-    }
-
-    @Override
     public CustomTableModel defineModel(Data data) {
         return new FormulaCapableTableModel(super.defineModel(data));
     }

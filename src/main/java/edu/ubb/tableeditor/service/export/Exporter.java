@@ -1,10 +1,10 @@
 package edu.ubb.tableeditor.service.export;
 
-import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.model.converter.Converter;
 import edu.ubb.tableeditor.model.converter.DecimalConverter;
 import edu.ubb.tableeditor.model.converter.IntegerConverter;
 import edu.ubb.tableeditor.model.converter.PhoneNumberConverter;
+import edu.ubb.tableeditor.model.data.Data;
 
 public abstract class Exporter {
 
