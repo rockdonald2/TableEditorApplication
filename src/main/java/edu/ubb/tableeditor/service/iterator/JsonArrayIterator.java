@@ -25,6 +25,8 @@ public class JsonArrayIterator implements Iterator<JsonObject> {
     }
 
     public JsonArrayIterator(JsonArray array) {
+        Objects.requireNonNull(array);
+
         this.array = array;
     }
 

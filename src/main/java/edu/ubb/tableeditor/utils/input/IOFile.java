@@ -50,7 +50,7 @@ public abstract class IOFile {
 
     public abstract Importer getImporter();
 
-    public Path getPath() {
+    public final Path getPath() {
         return this.file;
     }
 

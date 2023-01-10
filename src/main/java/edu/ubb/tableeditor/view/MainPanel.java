@@ -37,13 +37,14 @@ import java.util.*;
 @Singleton
 public final class MainPanel extends JFrame {
 
-    public static final String TOGGLE_FORMULAS = "Toggle Formulas";
-    public static final String TOGGLE_ROW_NUMBERING = "Toggle Row Numbering";
+    private static final String TOGGLE_FORMULAS = "Toggle Formulas";
+    private static final String TOGGLE_ROW_NUMBERING = "Toggle Row Numbering";
     private static MainPanel instance;
 
     private final MainController mainController;
     private final int windowHeight;
     private final int windowWidth;
+    private final java.util.List<JCheckBoxMenuItem> decoratorBtns = new ArrayList<>();
     private Table table;
     private JMenuItem addRowBtn;
     private JMenuItem addColumnBtn;
@@ -53,8 +54,6 @@ public final class MainPanel extends JFrame {
     private JMenuItem undoBtn;
     private JMenuItem redoBtn;
     private Optional<JMenuItem> valueRestrictionsPanelBtn = Optional.empty();
-
-    private final java.util.List<JCheckBoxMenuItem> decoratorBtns = new ArrayList<>();
 
     @Flag
     private boolean initialized;
@@ -186,7 +185,7 @@ public final class MainPanel extends JFrame {
         menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("<html><h3>Keyboard shortcuts</h3><p>CTRL-F: to search within the table</p>CTRL-S save the table<p>CTRL-Z: undo changes</p><p>CTRL-R redo changes</p><p>CTRL-O: open document</p></html>"), true);
 
         if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED)) { // if enabled
-            valueRestrictionsPanelBtn = Optional.of(menuBar.addItemToMenu(fileMenu.getText(), "Specify Value Restrictions...", this::triggerValueRestrictionsPanel, false));
+            valueRestrictionsPanelBtn = Optional.of(menuBar.addItemToMenu(fileMenu.getText(), "Specify Value Restrictions...", e -> mainController.doSetValueRestrictions(), false));
         }
 
         return menuBar;
@@ -341,10 +340,6 @@ public final class MainPanel extends JFrame {
         chartFrame.setLocationRelativeTo(null);
         chartFrame.setSize(windowWidth, windowHeight);
         chartFrame.setVisible(true);
-    }
-
-    private void triggerValueRestrictionsPanel(ActionEvent e) {
-        mainController.doSetValueRestrictions();
     }
 
     public void showValueRestrictionsPanel(Data data) {

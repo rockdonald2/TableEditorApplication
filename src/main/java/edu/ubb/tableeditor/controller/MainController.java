@@ -3,7 +3,6 @@ package edu.ubb.tableeditor.controller;
 import edu.ubb.tableeditor.annotation.Flag;
 import edu.ubb.tableeditor.annotation.Singleton;
 import edu.ubb.tableeditor.command.Command;
-import edu.ubb.tableeditor.command.PositionBasedCommand;
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.service.exception.ServiceException;
@@ -238,34 +237,6 @@ public final class MainController {
     private void toggleUndoRedoBtns() {
         mainPanel.toggleUndoBtn(!commands.isEmpty());
         mainPanel.toggleRedoBtn(!undidCommands.isEmpty());
-    }
-
-    public void updateCommands(PositionBasedCommand.Orientation orientation, PositionBasedCommand.Which which, int offset) {
-        commands.iterator().forEachRemaining(cmd -> internalUpdateCommand(cmd, orientation, which, offset));
-        undidCommands.iterator().forEachRemaining(cmd -> internalUpdateCommand(cmd, orientation, which, offset));
-    }
-
-    private void internalUpdateCommand(Command<?, ?> cmd, PositionBasedCommand.Orientation orientation, PositionBasedCommand.Which which, int offset) {
-        if (!(cmd instanceof final PositionBasedCommand<?, ?> positionBasedCmd)) return;
-
-        switch (orientation) {
-            case INCREASE -> {
-                switch (which) {
-                    case ROW ->
-                            positionBasedCmd.getEditPosition().setRow(positionBasedCmd.getEditPosition().getRow() + offset);
-                    case COLUMN ->
-                            positionBasedCmd.getEditPosition().setColumn(positionBasedCmd.getEditPosition().getColumn() + offset);
-                }
-            }
-            case DECREASE -> {
-                switch (which) {
-                    case ROW ->
-                            positionBasedCmd.getEditPosition().setRow(positionBasedCmd.getEditPosition().getRow() - offset);
-                    case COLUMN ->
-                            positionBasedCmd.getEditPosition().setColumn(positionBasedCmd.getEditPosition().getColumn() - offset);
-                }
-            }
-        }
     }
 
     public void showDiagram(DiagramStrategy diagramStrategy, int positionIdx) {

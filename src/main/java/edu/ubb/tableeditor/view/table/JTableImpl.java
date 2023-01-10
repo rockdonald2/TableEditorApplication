@@ -5,7 +5,6 @@ import edu.ubb.tableeditor.command.RemoveRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.model.field.Position;
-import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.view.diagrams.BarChartStrategy;
 import edu.ubb.tableeditor.view.diagrams.PieChartStrategy;
 import edu.ubb.tableeditor.view.table.model.BasicTableModel;
@@ -25,14 +24,10 @@ public class JTableImpl extends JTable implements Table {
     private final JScrollPane container;
 
     public JTableImpl() {
-        int windowWidth = PropertiesContext.getIntProperty("window.size.width");
-        int windowHeight = PropertiesContext.getIntProperty("window.size.height");
-
         this.setModel(this.defineModel(Data.get()));
         this.getTableHeader().setReorderingAllowed(false);
 
         this.container = new JScrollPane(getTable());
-        this.container.setPreferredSize(new Dimension(windowWidth, windowHeight));
 
         addPopup();
         addEditor();

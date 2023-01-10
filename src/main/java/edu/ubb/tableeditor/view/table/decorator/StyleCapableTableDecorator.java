@@ -27,8 +27,10 @@ public class StyleCapableTableDecorator extends TableDecorator {
 
         final JButton boldBtn = new JButton("B");
         boldBtn.setFont(boldBtn.getFont().deriveFont(Font.BOLD));
+        boldBtn.setToolTipText("Bold current cell selection");
         final JButton italicBtn = new JButton("I");
         italicBtn.setFont(italicBtn.getFont().deriveFont(Font.ITALIC));
+        italicBtn.setToolTipText("Italic current cell selection");
 
         boldBtn.addActionListener(e -> reevaluateStyles(Style.BOLD));
         italicBtn.addActionListener(e -> reevaluateStyles(Style.ITALIC));
@@ -100,6 +102,11 @@ public class StyleCapableTableDecorator extends TableDecorator {
 
         public StyledTableCellRenderer(Map<Position, List<Style>> styles) {
             this.styles = styles;
+        }
+
+        @Override
+        public String getToolTipText() {
+            return "Click cell to edit";
         }
 
         @Override
