@@ -51,10 +51,10 @@ public final class MainController {
             throw new IllegalStateException(String.format("%s already initialized", MainPanel.class.getName()));
         }
 
-        doCreateBlankData();
         this.mainPanel = MainPanel.instance();
         this.mainPanel.init();
         initialized = true;
+        doCreateBlankData();
     }
 
     public int getColumns() {
@@ -70,6 +70,10 @@ public final class MainController {
             IOFile ioFile = IOFile.getFileAsIOFile(file.toPath());
 
             this.data = ioFile.getImporter().importData(ioFile);
+
+            commands.clear();
+            undidCommands.clear();
+            toggleUndoRedoBtns();
 
             doDisplayData();
             mainPanel.showInfo("Successfully imported data");
@@ -249,6 +253,10 @@ public final class MainController {
 
     public void doCreateBlankData() {
         this.data = Data.get();
+
+        commands.clear();
+        undidCommands.clear();
+        toggleUndoRedoBtns();
     }
 
     public void doSetValueRestrictions() {
