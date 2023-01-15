@@ -6,7 +6,8 @@ import edu.ubb.tableeditor.command.Command;
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.service.exception.ServiceException;
-import edu.ubb.tableeditor.service.search.SearchStrategy;
+import edu.ubb.tableeditor.service.search.Pipeline;
+import edu.ubb.tableeditor.service.search.WholeCellSearchStrategy;
 import edu.ubb.tableeditor.service.sort.DefaultSortStrategy;
 import edu.ubb.tableeditor.utils.input.IOFile;
 import edu.ubb.tableeditor.view.MainPanel;
@@ -163,13 +164,21 @@ public final class MainController {
     }
 
     public void doSearch() {
-        final Optional<Map.Entry<SearchStrategy, String>> search = mainPanel.getSearchInput();
+        final Optional<Pipeline<List<List<String>>, List<List<String>>>> searchPipeline = mainPanel.getSearchInput();
 
-        if (search.isEmpty()) {
+        if (searchPipeline.isEmpty()) {
+            mainPanel.clearTableSelection();
             return;
         }
 
-        final Position position = data.search(search.get().getKey(), search.get().getValue());
+        final List<List<String>> output = searchPipeline.get().execute(data.getData());
+
+        if (output.isEmpty()) {
+            mainPanel.clearTableSelection();
+            return;
+        }
+
+        Position position = data.search(new WholeCellSearchStrategy(), output.get(0).get(0));
 
         if (position != null) {
             mainPanel.selectTableCell(position);

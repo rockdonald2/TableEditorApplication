@@ -10,13 +10,12 @@ import edu.ubb.tableeditor.command.AddRowCommand;
 import edu.ubb.tableeditor.controller.MainController;
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.model.field.Position;
-import edu.ubb.tableeditor.service.search.MatchCaseSearchStrategy;
-import edu.ubb.tableeditor.service.search.SearchStrategy;
-import edu.ubb.tableeditor.service.search.SubStringSearchStrategy;
-import edu.ubb.tableeditor.service.search.WholeCellSearchStrategy;
+import edu.ubb.tableeditor.service.search.MatchCaseSearchHandler;
+import edu.ubb.tableeditor.service.search.Pipeline;
+import edu.ubb.tableeditor.service.search.SubStringSearchHandler;
+import edu.ubb.tableeditor.service.search.WholeStringSearchHandler;
 import edu.ubb.tableeditor.utils.PropertiesContext;
 import edu.ubb.tableeditor.utils.input.IOFile;
-import edu.ubb.tableeditor.view.button.SearchRadioButton;
 import edu.ubb.tableeditor.view.exception.ViewException;
 import edu.ubb.tableeditor.view.menu.MenuBar;
 import edu.ubb.tableeditor.view.table.JTableImpl;
@@ -287,23 +286,23 @@ public final class MainPanel extends JFrame {
         return Optional.ofNullable(chooser.getSelectedFile());
     }
 
-    public Optional<Map.Entry<SearchStrategy, String>> getSearchInput() {
+    public Optional<Pipeline<List<List<String>>, List<List<String>>>> getSearchInput() {
         final JPanel mainSearchPanel = new JPanel(new GridLayout(2, 1));
         mainSearchPanel.add(new JLabel("Find cell"));
 
         final JPanel subSearchPanel = new JPanel();
+        final JRadioButton subStringBtn = new JRadioButton("Match substring", true);
+        final JRadioButton wholeStringBtn = new JRadioButton("Match entire cell content", false);
 
-        final SearchRadioButton subStringBtn = new SearchRadioButton("Match substring", new SubStringSearchStrategy(), true);
         subSearchPanel.add(subStringBtn);
-        final SearchRadioButton wholeCellBtn = new SearchRadioButton("Match entire cell content", new WholeCellSearchStrategy());
-        subSearchPanel.add(wholeCellBtn);
-        final SearchRadioButton matchCaseBtn = new SearchRadioButton("Match case", new MatchCaseSearchStrategy());
-        subSearchPanel.add(matchCaseBtn);
+        subSearchPanel.add(wholeStringBtn);
 
         ButtonGroup radioBtns = new ButtonGroup();
         radioBtns.add(subStringBtn);
-        radioBtns.add(wholeCellBtn);
-        radioBtns.add(matchCaseBtn);
+        radioBtns.add(wholeStringBtn);
+
+        final JCheckBox matchCaseCheck = new JCheckBox("Match case", false);
+        subSearchPanel.add(matchCaseCheck);
 
         mainSearchPanel.add(subSearchPanel);
 
@@ -313,15 +312,23 @@ public final class MainPanel extends JFrame {
             return Optional.empty();
         }
 
+        Pipeline<List<List<String>>, List<List<String>>> pipeline = null;
+
         if (subStringBtn.isSelected()) {
-            return Optional.of(Map.entry(subStringBtn.getSearchStrategy(), searchWord));
-        } else if (wholeCellBtn.isSelected()) {
-            return Optional.of(Map.entry(wholeCellBtn.getSearchStrategy(), searchWord));
-        } else if (matchCaseBtn.isSelected()) {
-            return Optional.of(Map.entry(matchCaseBtn.getSearchStrategy(), searchWord));
+            pipeline = new Pipeline<>(new SubStringSearchHandler(searchWord));
+        } else if (wholeStringBtn.isSelected()) {
+            pipeline = new Pipeline<>(new WholeStringSearchHandler(searchWord));
         }
 
-        throw new ViewException("No search radio button selected");
+        if (pipeline == null) {
+            throw new ViewException("No search radio button selected");
+        }
+
+        if (matchCaseCheck.isSelected()) {
+            pipeline = pipeline.addHandler(new MatchCaseSearchHandler(searchWord));
+        }
+
+        return Optional.of(pipeline);
     }
 
     public void selectTableCell(Position position) {
