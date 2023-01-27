@@ -9,7 +9,7 @@
   ],
   "data": [
     {
-      "clientName": "Lukacs Zsolt",
+      "clientName": "Csaba",
       "clientEmail": "lukacs.zsolt@email.com",
       "clientTel": "+40074323213",
       "clientAge": 22,
@@ -17,7 +17,7 @@
       "Test2": 4
     },
     {
-      "clientName": "Lukacs Csaba",
+      "clientName": "Csaba",
       "clientEmail": "lukacs.csaba@email.com",
       "clientTel": "+40074323213",
       "clientAge": 29,
@@ -27,8 +27,8 @@
     {
       "clientName": "Zsolt",
       "clientEmail": "",
-      "clientTel": "",
-      "clientAge": 24,
+      "clientTel": "asd",
+      "clientAge": 20,
       "Test": 3,
       "Test2": ""
     }

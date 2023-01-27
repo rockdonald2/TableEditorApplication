@@ -18,11 +18,5 @@
       "clientTel": "+40074323213",
       "clientAge": 29
     }
-  ],
-  "valueRestrictions": {
-    "clientName": [
-      "Zsolt",
-      "Csaba"
-    ]
-  }
+  ]
 }
