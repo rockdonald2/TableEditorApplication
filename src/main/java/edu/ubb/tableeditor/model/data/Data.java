@@ -18,6 +18,8 @@ public interface Data {
             return new BasicData();
         } else if ("valuerestricted".equalsIgnoreCase(dataFormat)) {
             return new RestrictedData();
+        } else if ("augmented".equalsIgnoreCase(dataFormat)) {
+            return new AugmentedData();
         }
 
         throw new IllegalStateException("No date format specified in properties");
@@ -30,6 +32,8 @@ public interface Data {
             return DataFormat.BASIC;
         } else if ("valuerestricted".equalsIgnoreCase(dataFormat)) {
             return DataFormat.VALUERESTRICTED;
+        } else if ("augmented".equalsIgnoreCase(dataFormat)) {
+            return DataFormat.AUGMENTED;
         }
 
         throw new IllegalStateException("No date format specified in properties");
@@ -47,6 +51,10 @@ public interface Data {
 
     void setValueRestrictions(List<Map.Entry<String, List<String>>> valueRestrictions);
 
+    Map<String, Object> getAugmentation();
+
+    void setAugmentation(Map<String, Object> augmentation);
+
     default void sort(SortStrategy sortStrategy, ComparatorStrategy comparatorStrategy) {
         sortStrategy.sort(this, comparatorStrategy);
     }
@@ -57,7 +65,8 @@ public interface Data {
 
     enum DataFormat {
         BASIC,
-        VALUERESTRICTED
+        VALUERESTRICTED,
+        AUGMENTED
     }
 
 }

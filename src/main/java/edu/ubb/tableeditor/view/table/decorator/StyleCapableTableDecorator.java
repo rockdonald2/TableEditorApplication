@@ -1,7 +1,9 @@
 package edu.ubb.tableeditor.view.table.decorator;
 
+import edu.ubb.tableeditor.controller.MainController;
 import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.view.table.Table;
+import edu.ubb.tableeditor.view.table.model.CustomTableModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -42,6 +44,20 @@ public class StyleCapableTableDecorator extends TableDecorator {
         container.setColumnHeaderView(toolbar);
     }
 
+    @Override
+    public void displayData(CustomTableModel tableModel) {
+        super.displayData(tableModel);
+
+        var tmpStyles = (Map<Position, List<Style>>) MainController.instance().getAugmentationValue("style");
+        if (tmpStyles != null) {
+            this.styles = tmpStyles;
+            this.getTable().setDefaultRenderer(Object.class, new StyledTableCellRenderer(styles));
+        }
+
+        this.getTable().repaint();
+        this.getTable().validate();
+    }
+
     private void reevaluateStyles(Style style) {
         final List<Integer> selectedRows = Arrays.stream(this.getTable().getSelectedRows()).boxed().toList();
         final List<Integer> selectedColumns = Arrays.stream(this.getTable().getSelectedColumns()).boxed().toList();
@@ -68,6 +84,9 @@ public class StyleCapableTableDecorator extends TableDecorator {
             }
         }
 
+        // save styles to data
+        MainController.instance().setAugmentationValue("style", styles);
+
         this.getTable().repaint();
         this.getTable().validate();
     }
@@ -93,7 +112,17 @@ public class StyleCapableTableDecorator extends TableDecorator {
 
     public enum Style {
         BOLD,
-        ITALIC
+        ITALIC;
+
+        public static Style of(String value) {
+            if (value.equalsIgnoreCase("bold")) {
+                return Style.BOLD;
+            } else if (value.equalsIgnoreCase("italic")) {
+                return Style.ITALIC;
+            }
+
+            return null;
+        }
     }
 
     private static class StyledTableCellRenderer extends DefaultTableCellRenderer {

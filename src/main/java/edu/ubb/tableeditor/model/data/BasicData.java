@@ -45,4 +45,14 @@ public class BasicData implements Data {
         // do nothing
     }
 
+    @Override
+    public Map<String, Object> getAugmentation() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public void setAugmentation(Map<String, Object> augmentation) {
+        // do nothing
+    }
+
 }

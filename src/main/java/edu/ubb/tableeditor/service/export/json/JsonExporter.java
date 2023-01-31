@@ -2,9 +2,11 @@ package edu.ubb.tableeditor.service.export.json;
 
 import edu.ubb.tableeditor.model.data.Data;
 import edu.ubb.tableeditor.model.field.Field;
+import edu.ubb.tableeditor.model.field.Position;
 import edu.ubb.tableeditor.service.export.ExportVisitor;
 import edu.ubb.tableeditor.service.export.Exporter;
 import edu.ubb.tableeditor.utils.json.JsonConstants;
+import edu.ubb.tableeditor.view.table.decorator.StyleCapableTableDecorator;
 
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,41 @@ public class JsonExporter extends Exporter {
             restrictionIdx.incrementAndGet();
         });
 
-        exportedData.append(JsonConstants.CURLY_CLOSE_BRACKETS)
+        exportedData.append(JsonConstants.CURLY_CLOSE_BRACKETS);
+
+        final Map<Position, List<StyleCapableTableDecorator.Style>> styles = (Map<Position, List<StyleCapableTableDecorator.Style>>) data.getAugmentation().get("style");
+
+        exportedData
+                .append(JsonConstants.COMMA)
+                .append("\"styles\"")
+                .append(JsonConstants.COLON)
+                .append(JsonConstants.CURLY_OPEN_BRACKETS);
+
+        AtomicInteger stylesIdx = new AtomicInteger(0);
+        styles.keySet()
+                .forEach(position -> {
+                    if (styles.get(position) != null && !styles.get(position).isEmpty()) {
+                        exportedData
+                                .append("\"")
+                                .append(position.getRow())
+                                .append(";")
+                                .append(position.getColumn())
+                                .append("\"")
+                                .append(JsonConstants.COLON);
+
+                        exportedData
+                                .append(styles.get(position).stream().map(style -> String.format(QUOTE_WRAPPER, style.toString())).toList());
+
+                        if (stylesIdx.get() < (styles.size() - 1)) {
+                            exportedData.append(JsonConstants.COMMA);
+                        }
+
+                        stylesIdx.incrementAndGet();
+                    }
+                });
+
+        exportedData
+                .append(JsonConstants.CURLY_CLOSE_BRACKETS)
                 .append(JsonConstants.CURLY_CLOSE_BRACKETS);
     }
 

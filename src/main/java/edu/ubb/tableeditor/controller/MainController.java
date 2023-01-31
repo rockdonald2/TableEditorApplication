@@ -200,18 +200,6 @@ public final class MainController {
         return data.getHeaders().get(col);
     }
 
-    public void setHeaders(String[] headers) {
-        data.setHeaders(new ArrayList<>(List.of(headers)));
-    }
-
-    public void addValueAt(int rowIdx, int colIdx, String value) {
-        data.getData().get(rowIdx).add(colIdx, value);
-    }
-
-    public void setValueAt(int rowIdx, int colIdx, String value) {
-        data.getData().get(rowIdx).set(colIdx, value);
-    }
-
     public void executeCommand(Command<?, ?> command) {
         commands.push(command);
         command.execute();
@@ -284,6 +272,16 @@ public final class MainController {
 
         this.data.setValueRestrictions(new ArrayList<>(newValueRestrictions.toList()));
         doDisplayData();
+    }
+
+    public void setAugmentationValue(String augmentationKey, Object storedValue) {
+        this.data.getAugmentation().put(augmentationKey, storedValue);
+    }
+
+    public Object getAugmentationValue(String augmentationKey) {
+        if (this.data == null) return null;
+
+        return this.data.getAugmentation().get(augmentationKey);
     }
 
 }

@@ -14,26 +14,6 @@ public class RestrictedData extends BasicData {
     }
 
     @Override
-    public List<String> getHeaders() {
-        return headers;
-    }
-
-    @Override
-    public void setHeaders(List<String> headers) {
-        this.headers = headers;
-    }
-
-    @Override
-    public List<List<String>> getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(List<List<String>> data) {
-        this.data = data;
-    }
-
-    @Override
     public List<Map.Entry<String, List<String>>> getValueRestrictions() {
         return valueRestrictions;
     }

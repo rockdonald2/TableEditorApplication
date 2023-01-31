@@ -4,12 +4,28 @@ import java.util.Objects;
 
 public class Position {
 
+    public static final String SEPARATOR = ";";
+
     private int row;
     private int column;
 
     public Position(int row, int column) {
         this.row = row;
         this.column = column;
+    }
+
+    public static Position of(String value) {
+        String[] splitted = value.split(SEPARATOR);
+
+        if (splitted.length != 2) {
+            return null;
+        }
+
+        try {
+            return new Position(Integer.parseInt(splitted[0]), Integer.parseInt(splitted[1]));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public int getColumn() {

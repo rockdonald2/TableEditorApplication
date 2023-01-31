@@ -146,7 +146,7 @@ public final class MainPanel extends JFrame {
     private Table createTable() {
         this.table = new JTableImpl();
 
-        if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED)) {
+        if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED) || Data.getFormat().equals(Data.DataFormat.AUGMENTED)) {
             this.table = new ValueRestrictedTableDecorator(new JTableImpl());
         }
 
@@ -183,7 +183,7 @@ public final class MainPanel extends JFrame {
 
         menuBar.addItemToMenu(helpMenu.getText(), "Help", e -> showInfo("<html><h3>Keyboard shortcuts</h3><p>CTRL-F: to search within the table</p>CTRL-S save the table<p>CTRL-Z: undo changes</p><p>CTRL-R redo changes</p><p>CTRL-O: open document</p></html>"), true);
 
-        if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED)) { // if enabled
+        if (Data.getFormat().equals(Data.DataFormat.VALUERESTRICTED) || Data.getFormat().equals(Data.DataFormat.AUGMENTED)) { // if enabled
             valueRestrictionsPanelBtn = Optional.of(menuBar.addItemToMenu(fileMenu.getText(), "Specify Value Restrictions...", e -> mainController.doSetValueRestrictions(), false));
         }
 
