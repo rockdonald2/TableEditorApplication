@@ -107,7 +107,7 @@ public class JsonExporter extends Exporter {
                         exportedData
                                 .append("\"")
                                 .append(position.getRow())
-                                .append(";")
+                                .append(Position.SEPARATOR)
                                 .append(position.getColumn())
                                 .append("\"")
                                 .append(JsonConstants.COLON);
