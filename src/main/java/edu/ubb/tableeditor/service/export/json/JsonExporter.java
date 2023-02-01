@@ -8,6 +8,7 @@ import edu.ubb.tableeditor.service.export.Exporter;
 import edu.ubb.tableeditor.utils.json.JsonConstants;
 import edu.ubb.tableeditor.view.table.decorator.StyleCapableTableDecorator;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -85,7 +86,13 @@ public class JsonExporter extends Exporter {
 
         exportedData.append(JsonConstants.CURLY_CLOSE_BRACKETS);
 
-        final Map<Position, List<StyleCapableTableDecorator.Style>> styles = (Map<Position, List<StyleCapableTableDecorator.Style>>) data.getAugmentation().get("style");
+        Map<Position, List<StyleCapableTableDecorator.Style>> tmpStyles = (Map<Position, List<StyleCapableTableDecorator.Style>>) data.getAugmentation().get("style");
+
+        if (tmpStyles == null) {
+            tmpStyles = new HashMap<>();
+        }
+
+        final Map<Position, List<StyleCapableTableDecorator.Style>> styles = tmpStyles;
 
         exportedData
                 .append(JsonConstants.COMMA)
